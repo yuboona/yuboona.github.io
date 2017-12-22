@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,爬虫,Mysql," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com 前言&amp;emsp;&amp;emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来 携程分析数据&amp;emsp;&amp;emsp;首先我们去携程的鼓浪屿景点速览看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结">
+<meta name="keywords" content="Python,爬虫,Mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="爬取携程和蚂蜂窝的景点评论数据">
+<meta property="og:url" content="http://yoursite.com/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/index.html">
+<meta property="og:site_name" content="Thinking makes Someone">
+<meta property="og:description" content="本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com 前言&amp;emsp;&amp;emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来 携程分析数据&amp;emsp;&amp;emsp;首先我们去携程的鼓浪屿景点速览看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg">
+<meta property="og:image" content="http://111.230.251.140:8000/images/gulangyu_check.jpg">
+<meta property="og:image" content="http://111.230.251.140:8000/images/ctrip_mysql.jpg">
+<meta property="og:image" content="http://111.230.251.140:8000/images/mafengwo_detail.jpg">
+<meta property="og:image" content="http://111.230.251.140:8000/images/mafengwo_all_scenery.jpg">
+<meta property="og:image" content="http://111.230.251.140:8000/images/mafengwo_router_header.jpg">
+<meta property="og:image" content="http://111.230.251.140:8000/images/mafengwo_router_preview.jpg">
+<meta property="og:updated_time" content="2017-12-22T13:30:00.790Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="爬取携程和蚂蜂窝的景点评论数据">
+<meta name="twitter:description" content="本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com 前言&amp;emsp;&amp;emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来 携程分析数据&amp;emsp;&amp;emsp;首先我们去携程的鼓浪屿景点速览看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结">
+<meta name="twitter:image" content="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/"/>
+
+
+
+
+
+  <title>爬取携程和蚂蜂窝的景点评论数据 | Thinking makes Someone</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Thinking makes Someone</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Learn for Knowledge,Code from Zero.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">爬取携程和蚂蜂窝的景点评论数据</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:27:58+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来</p>
+<h2 id="携程"><a href="#携程" class="headerlink" title="携程"></a>携程</h2><h3 id="分析数据"><a href="#分析数据" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;首先我们去携程的<a href="http://you.ctrip.com/sight/gulangyu120058.html" target="_blank" rel="noopener">鼓浪屿景点速览</a>看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结构应该都是差不多的，所以我们选择<a href="http://you.ctrip.com/sight/gulangyu120058/57405.html" target="_blank" rel="noopener">第一个景点</a>进去看看具体的页面应该怎么爬取。</p>
+<p><img src="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg" alt="鼓浪屿评论分析" title="结果"></p>
+<p>我们需要的是红圈的部分，很容易可以知道这个评论页面是动态加载的，所以不能直接用bs4或者正则直接提取元素，我们需要分析一下页面动态传输的接口。打开chrome审查元素,切换到network查看一下传输的内容，首先清空内容避免干扰，然后点击下一页，我们可以得到</p>
+<p><img src="http://111.230.251.140:8000/images/gulangyu_check.jpg" alt="鼓浪屿审查元素" title="结果"></p>
+<p>通过查看传回的数据我们可以得到这就是我们所要的接口，使用的是post进行传输，传输的Form Data 有很多字段，大致可以猜测出来</p>
+<blockquote>
+<p>poiID 是景点的poiID <br> pagenow 是当前的页数 <br> star 是评分1-5，0代表全部 <br> resourceId 是一个每个资源对应的值</p>
+</blockquote>
+<p>爬取的时候只需要改变这些值就可以根据自己的需求爬取内容了，但是需要注意的事携程的pagenow最多只能获取100页，而且poiID和resourceId的值是没有规律的，需要我们逐个景点查看…我自己依次找了鼓浪屿所有景点的值，并存在文本中，文末有github的共享。</p>
+<h3 id="建库"><a href="#建库" class="headerlink" title="建库"></a>建库</h3><p>&emsp;&emsp;我们要做的第一件事就是想好数据库的结构,我选择的还是使用mysql，具体的结构如下：</p>
+<p><img src="http://111.230.251.140:8000/images/ctrip_mysql.jpg" alt="携程建库" title="结果"></p>
+<h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><p>&emsp;&emsp;这个我就不具体分析了，也不难，就是有几个坑要注意一下。</p>
+<blockquote>
+<p>第一，不是所有评论都有景色，性价比之类的评分，所以这里要加一个判断。<br> 第二，原来是有出行时间这一项的，现在好像没有了额。<br> 第三，评论文本可能会出现单引号，插入数据库会出现错误，要转义或者替代一下。<br> 第四，抓取速度不要太快，携程反扒还是比较厉害的。</p>
+</blockquote>
+<h2 id="蚂蜂窝"><a href="#蚂蜂窝" class="headerlink" title="蚂蜂窝"></a>蚂蜂窝</h2><h3 id="分析数据-1"><a href="#分析数据-1" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;同样，蚂蜂窝的数据也是动态加载的，用相同的方法查看分析数据接口。</p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_detail.jpg" alt="蚂蜂窝" title="结果"></p>
+<p>可以看到蚂蜂窝的数据获取方式是get，我们可以找出请求的url的规律。经过比较不同景点和不同页面的数据，我们发现参数的改变主要在两个地方，一个是poiid我用href代替，一个是页数我用num代替。获取景点的评论数据只要改变这两个值就可以了</p>
+<blockquote>
+<p>url=’<a href="http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D" target="_blank" rel="noopener">http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D</a>‘</p>
+</blockquote>
+<h3 id="获取每个景点的poi"><a href="#获取每个景点的poi" class="headerlink" title="获取每个景点的poi"></a>获取每个景点的poi</h3><p>这个不是post请求我们就不必一个个景点去获取参数了，我们可以访问<a href="http://www.mafengwo.cn/jd/12522/gonglve.html" target="_blank" rel="noopener">这个站点</a>来发现所有的用户，然而这个站点的数据也是动态加载的</p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_all_scenery.jpg" alt="蚂蜂窝" title="结果"></p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_router_header.jpg" alt="蚂蜂窝" title="结果"></p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_router_preview.jpg" alt="蚂蜂窝" title="结果"></p>
+<p>根据上面的图片我们可以清晰的看到我们只需要传入页码数就可以得到所有的景点的poiid,然后根据这些poiid我们就可以得到所有的评论数据，这一部分我们用一个函数来处理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_param</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 获取所有景点的参数</span></span><br><span class="line">    total = []</span><br><span class="line">    router_url = <span class="string">'http://www.mafengwo.cn/ajax/router.php'</span></span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">6</span>):</span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">'sAct'</span>: <span class="string">'KMdd_StructWebAjax|GetPoisByTag'</span>,</span><br><span class="line">            <span class="string">'iMddid'</span>: <span class="number">12522</span>,</span><br><span class="line">            <span class="string">'iTagId'</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="string">'iPage'</span>: num</span><br><span class="line">        &#125;</span><br><span class="line">        pos = requests.post(url=router_url, data=params, headers=headers).json()</span><br><span class="line">        soup_pos = BeautifulSoup(pos[<span class="string">'data'</span>][<span class="string">'list'</span>], <span class="string">'lxml'</span>)</span><br><span class="line"></span><br><span class="line">        result = [&#123;<span class="string">'scenery'</span>: p[<span class="string">'title'</span>], <span class="string">'href'</span>: re.findall(re.compile(<span class="string">r'/poi/(\d+).html'</span>), p[<span class="string">'href'</span>])[<span class="number">0</span>]&#125; <span class="keyword">for</span> p <span class="keyword">in</span></span><br><span class="line">                  soup_pos.find_all(<span class="string">'a'</span>)]</span><br><span class="line">        total.extend(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> total</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;其余部分相似，不再过多说明。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/爬虫/" rel="tag"># 爬虫</a>
+          
+            <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/22/爬取微博图片数据存到Mysql中遇到的各种坑/" rel="next" title="爬取微博图片数据存到Mysql中遇到的各种坑">
+                <i class="fa fa-chevron-left"></i> 爬取微博图片数据存到Mysql中遇到的各种坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yuboona Zhang</p>
+              <p class="site-description motion-element" itemprop="description">Crazy for Tec.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/yuboona" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yuboobaZhang@Yahoo.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x524D;&#x8A00;" class="headerlink" title="&#x524D;&#x8A00;"></a>&#x524D;&#x8A00;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#携程"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x643A;&#x7A0B;" class="headerlink" title="&#x643A;&#x7A0B;"></a>&#x643A;&#x7A0B;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分析数据"><span class="nav-number">1.1.1.</span> <span class="nav-text"><a href="#&#x5206;&#x6790;&#x6570;&#x636E;" class="headerlink" title="&#x5206;&#x6790;&#x6570;&#x636E;"></a>&#x5206;&#x6790;&#x6570;&#x636E;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#建库"><span class="nav-number">1.1.2.</span> <span class="nav-text"><a href="#&#x5EFA;&#x5E93;" class="headerlink" title="&#x5EFA;&#x5E93;"></a>&#x5EFA;&#x5E93;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取数据"><span class="nav-number">1.1.3.</span> <span class="nav-text"><a href="#&#x83B7;&#x53D6;&#x6570;&#x636E;" class="headerlink" title="&#x83B7;&#x53D6;&#x6570;&#x636E;"></a>&#x83B7;&#x53D6;&#x6570;&#x636E;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#蚂蜂窝"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x8682;&#x8702;&#x7A9D;" class="headerlink" title="&#x8682;&#x8702;&#x7A9D;"></a>&#x8682;&#x8702;&#x7A9D;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分析数据-1"><span class="nav-number">1.2.1.</span> <span class="nav-text"><a href="#&#x5206;&#x6790;&#x6570;&#x636E;-1" class="headerlink" title="&#x5206;&#x6790;&#x6570;&#x636E;"></a>&#x5206;&#x6790;&#x6570;&#x636E;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取每个景点的poi"><span class="nav-number">1.2.2.</span> <span class="nav-text"><a href="#&#x83B7;&#x53D6;&#x6BCF;&#x4E2A;&#x666F;&#x70B9;&#x7684;poi" class="headerlink" title="&#x83B7;&#x53D6;&#x6BCF;&#x4E2A;&#x666F;&#x70B9;&#x7684;poi"></a>&#x83B7;&#x53D6;&#x6BCF;&#x4E2A;&#x666F;&#x70B9;&#x7684;poi</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yuboona Zhang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -252,6 +252,783 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/" itemprop="url">爬取携程和蚂蜂窝的景点评论数据</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:27:58+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来</p>
+<h2 id="携程"><a href="#携程" class="headerlink" title="携程"></a>携程</h2><h3 id="分析数据"><a href="#分析数据" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;首先我们去携程的<a href="http://you.ctrip.com/sight/gulangyu120058.html" target="_blank" rel="noopener">鼓浪屿景点速览</a>看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结构应该都是差不多的，所以我们选择<a href="http://you.ctrip.com/sight/gulangyu120058/57405.html" target="_blank" rel="noopener">第一个景点</a>进去看看具体的页面应该怎么爬取。</p>
+<p><img src="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg" alt="鼓浪屿评论分析" title="结果"></p>
+<p>我们需要的是红圈的部分，很容易可以知道这个评论页面是动态加载的，所以不能直接用bs4或者正则直接提取元素，我们需要分析一下页面动态传输的接口。打开chrome审查元素,切换到network查看一下传输的内容，首先清空内容避免干扰，然后点击下一页，我们可以得到</p>
+<p><img src="http://111.230.251.140:8000/images/gulangyu_check.jpg" alt="鼓浪屿审查元素" title="结果"></p>
+<p>通过查看传回的数据我们可以得到这就是我们所要的接口，使用的是post进行传输，传输的Form Data 有很多字段，大致可以猜测出来</p>
+<blockquote>
+<p>poiID 是景点的poiID <br> pagenow 是当前的页数 <br> star 是评分1-5，0代表全部 <br> resourceId 是一个每个资源对应的值</p>
+</blockquote>
+<p>爬取的时候只需要改变这些值就可以根据自己的需求爬取内容了，但是需要注意的事携程的pagenow最多只能获取100页，而且poiID和resourceId的值是没有规律的，需要我们逐个景点查看…我自己依次找了鼓浪屿所有景点的值，并存在文本中，文末有github的共享。</p>
+<h3 id="建库"><a href="#建库" class="headerlink" title="建库"></a>建库</h3><p>&emsp;&emsp;我们要做的第一件事就是想好数据库的结构,我选择的还是使用mysql，具体的结构如下：</p>
+<p><img src="http://111.230.251.140:8000/images/ctrip_mysql.jpg" alt="携程建库" title="结果"></p>
+<h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><p>&emsp;&emsp;这个我就不具体分析了，也不难，就是有几个坑要注意一下。</p>
+<blockquote>
+<p>第一，不是所有评论都有景色，性价比之类的评分，所以这里要加一个判断。<br> 第二，原来是有出行时间这一项的，现在好像没有了额。<br> 第三，评论文本可能会出现单引号，插入数据库会出现错误，要转义或者替代一下。<br> 第四，抓取速度不要太快，携程反扒还是比较厉害的。</p>
+</blockquote>
+<h2 id="蚂蜂窝"><a href="#蚂蜂窝" class="headerlink" title="蚂蜂窝"></a>蚂蜂窝</h2><h3 id="分析数据-1"><a href="#分析数据-1" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;同样，蚂蜂窝的数据也是动态加载的，用相同的方法查看分析数据接口。</p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_detail.jpg" alt="蚂蜂窝" title="结果"></p>
+<p>可以看到蚂蜂窝的数据获取方式是get，我们可以找出请求的url的规律。经过比较不同景点和不同页面的数据，我们发现参数的改变主要在两个地方，一个是poiid我用href代替，一个是页数我用num代替。获取景点的评论数据只要改变这两个值就可以了</p>
+<blockquote>
+<p>url=’<a href="http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D" target="_blank" rel="noopener">http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D</a>‘</p>
+</blockquote>
+<h3 id="获取每个景点的poi"><a href="#获取每个景点的poi" class="headerlink" title="获取每个景点的poi"></a>获取每个景点的poi</h3><p>这个不是post请求我们就不必一个个景点去获取参数了，我们可以访问<a href="http://www.mafengwo.cn/jd/12522/gonglve.html" target="_blank" rel="noopener">这个站点</a>来发现所有的用户，然而这个站点的数据也是动态加载的</p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_all_scenery.jpg" alt="蚂蜂窝" title="结果"></p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_router_header.jpg" alt="蚂蜂窝" title="结果"></p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_router_preview.jpg" alt="蚂蜂窝" title="结果"></p>
+<p>根据上面的图片我们可以清晰的看到我们只需要传入页码数就可以得到所有的景点的poiid,然后根据这些poiid我们就可以得到所有的评论数据，这一部分我们用一个函数来处理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_param</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 获取所有景点的参数</span></span><br><span class="line">    total = []</span><br><span class="line">    router_url = <span class="string">'http://www.mafengwo.cn/ajax/router.php'</span></span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">6</span>):</span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">'sAct'</span>: <span class="string">'KMdd_StructWebAjax|GetPoisByTag'</span>,</span><br><span class="line">            <span class="string">'iMddid'</span>: <span class="number">12522</span>,</span><br><span class="line">            <span class="string">'iTagId'</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="string">'iPage'</span>: num</span><br><span class="line">        &#125;</span><br><span class="line">        pos = requests.post(url=router_url, data=params, headers=headers).json()</span><br><span class="line">        soup_pos = BeautifulSoup(pos[<span class="string">'data'</span>][<span class="string">'list'</span>], <span class="string">'lxml'</span>)</span><br><span class="line"></span><br><span class="line">        result = [&#123;<span class="string">'scenery'</span>: p[<span class="string">'title'</span>], <span class="string">'href'</span>: re.findall(re.compile(<span class="string">r'/poi/(\d+).html'</span>), p[<span class="string">'href'</span>])[<span class="number">0</span>]&#125; <span class="keyword">for</span> p <span class="keyword">in</span></span><br><span class="line">                  soup_pos.find_all(<span class="string">'a'</span>)]</span><br><span class="line">        total.extend(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> total</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;其余部分相似，不再过多说明。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/爬取微博图片数据存到Mysql中遇到的各种坑/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/22/爬取微博图片数据存到Mysql中遇到的各种坑/" itemprop="url">爬取微博图片数据存到Mysql中遇到的各种坑</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:26:42+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;由于硬件等各种原因需要把大概170多万2t左右的微博图片数据存到Mysql中.之前存微博数据一直用的非关系型数据库mongodb，由于对Mysql的各种不熟悉，踩了无数坑，来来回回改了3天才完成。</p>
+<h2 id="挖坑填坑之旅"><a href="#挖坑填坑之旅" class="headerlink" title="挖坑填坑之旅"></a>挖坑填坑之旅</h2><h3 id="建表"><a href="#建表" class="headerlink" title="建表"></a><strong>建表</strong></h3><p>存数据的时候首先需要设计数据库,我准备设计了3个表</p>
+<p>微博表：[id, userid, blog_text, lat, lng, created_time, reserve]&emsp;&emsp; <strong>pkey: id</strong></p>
+<p>图片表：[md5, pic_url, pic_bin, exif, reserve]&emsp;&emsp; <strong>pkey: md5</strong></p>
+<p>关系表：[id, md5, reserve]&emsp;&emsp; <strong>pkey: (id, md5) &emsp; fkey: (id, 微博表id)&emsp; (md5, 图片表md5)</strong></p>
+<p>&emsp;&emsp;建表的时候别的问题都还好，主要是 pic_bin 的类型和 blog_text 的类型有很大的问题，首先是pic_bin的类型，开始设置的为<strong>BLOB</strong>，但是运行之后发现BLOB最大只能存1M的数据，并不能满足微博图片的存储，后改成<strong>MEDIUMBLOB</strong>(16M)基本能够满足要求了。再后来就是blog_text，我遇到的第一个大坑</p>
+<p>&emsp;&emsp;开始的时候很自然的设置blog_text的类型为TEXT，但跑起来发现有些数据存不进去，会报错，经筛查发现是有些微博文本中包含了emoji表情…随后找了很多资料发现是因为utf8下文字是三字节，但是emoji是四字节，需要将编码改成utf8mb4。然而我在mac上整mysql的配置文件报各种奇葩错误,一怒之下把<strong>TEXT</strong>改成了<strong>BLOB</strong>，就好了。因为本地是MAC，我要连接到远程的一台Windows上才能通过那个Windows连接到群晖的Mysql上…本地配置改了也白改。</p>
+<h3 id="存图片"><a href="#存图片" class="headerlink" title="存图片"></a><strong>存图片</strong></h3><p>&emsp;&emsp;然后这就是一个<strong><em>大坑！！！</em></strong> 由于我使用的python3，所以读取图片得到的二进制的结果前面会有一个b’, 表示bytes，正是由于这个b’导致sql语句拼接的时候这个<strong>b后面的单引号会和sql语句的引号结合</strong>，导致后面的二进制没有在引号里面出错！二进制编码又不像string可以对字符转义，试了好多方法都不行！最后没有办法使用base64 对二进制进行加密转化成字符串，存到数据库中，然后要用时的时候再解密。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pic_bin = str(base64.b64encode(pic_bin))[<span class="number">2</span>:<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="改配置文件"><a href="#改配置文件" class="headerlink" title="改配置文件"></a><strong>改配置文件</strong></h3><p>&emsp;&emsp;由于使用Python多进程,一个小时8G数据量，图片数据比较大，发包的时候回超过mysql的默认限制，出现Mysql server has gone away, 这个时候要改配置文件，在配置文件中参数</p>
+<p><strong>max_allowed_packet = 600M</strong><br><strong>wait_timeout = 60000</strong></p>
+<h3 id="Lost-connection-to-Mysql-server-during-query"><a href="#Lost-connection-to-Mysql-server-during-query" class="headerlink" title="Lost connection to Mysql server during query"></a><strong>Lost connection to Mysql server during query</strong></h3><p>&emsp;&emsp;程序跑着跑着总会出现这个错误，一直找原因，试了各种办法看了好多资料，一直都是错误。实在不知道什么原因了…后来一想，我管他什么原因，失去连接之后重新连接就行了。使用conn.Ping(True) 判断是否连接mysql成功。如果失去连接就重新连接就行了！最后解决了这个问题</p>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a><strong>代码实现</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="comment"># Created by Baoyi on 2017/10/16</span></span><br><span class="line"><span class="keyword">from</span> multiprocessing.pool <span class="keyword">import</span> Pool</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> exifread</span><br><span class="line"><span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="keyword">import</span> configparser</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置logging</span></span><br><span class="line">logging.basicConfig(level=logging.WARNING,</span><br><span class="line">                    format=<span class="string">'%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s'</span>,</span><br><span class="line">                    datefmt=<span class="string">'%a, %d %b %Y %H:%M:%S'</span>,</span><br><span class="line">                    filename=<span class="string">'weibo.log'</span>,</span><br><span class="line">                    filemode=<span class="string">'w'</span>)</span><br><span class="line"></span><br><span class="line">cf = configparser.ConfigParser()</span><br><span class="line">cf.read(<span class="string">"ConfigParser.conf"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取配置mysql</span></span><br><span class="line">db_host = cf.get(<span class="string">"mysql"</span>, <span class="string">"db_host"</span>)</span><br><span class="line">db_port = cf.getint(<span class="string">"mysql"</span>, <span class="string">"db_port"</span>)</span><br><span class="line">db_user = cf.get(<span class="string">"mysql"</span>, <span class="string">"db_user"</span>)</span><br><span class="line">db_pass = cf.get(<span class="string">"mysql"</span>, <span class="string">"db_pass"</span>)</span><br><span class="line">db = cf.get(<span class="string">"mysql"</span>, <span class="string">"db"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建连接</span></span><br><span class="line">conn = pymysql.connect(host=db_host, user=db_user, passwd=db_pass, db=db, port=db_port, charset=<span class="string">'utf8'</span>)</span><br><span class="line"><span class="comment"># 获取游标</span></span><br><span class="line">cursor = conn.cursor()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建insert_sql</span></span><br><span class="line">insert_blog_sql = (</span><br><span class="line">    <span class="string">"INSERT IGNORE INTO blog(userid, id, blog_text, lat, lng, created_time) VALUES('&#123;uid&#125;', '&#123;id&#125;','&#123;blog_text&#125;','&#123;lat&#125;','&#123;lng&#125;','&#123;created_time&#125;')"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">insert_pic_sql = (</span><br><span class="line">    <span class="string">"INSERT IGNORE INTO pics(pic_url, pic_bin, md5, exif) VALUES ('&#123;pic_url&#125;','&#123;pic_bin&#125;','&#123;md5&#125;','&#123;exif&#125;')"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">insert_relationship_sql = (</span><br><span class="line">    <span class="string">"INSERT IGNORE INTO relationship(id, md5) VALUES ('&#123;id&#125;','&#123;md5&#125;')"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">uid = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./data/final_id.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        uid.append(i.strip(<span class="string">'\r\n'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 处理图片数据</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_pic</span><span class="params">(pic_url)</span>:</span></span><br><span class="line">    large_pic_url = pic_url.replace(<span class="string">'thumbnail'</span>, <span class="string">'large'</span>)</span><br><span class="line">    large_bin = requests.get(large_pic_url)</span><br><span class="line">    <span class="keyword">return</span> large_bin.content</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_poiid_info</span><span class="params">(uid)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        url = <span class="string">'https://api.weibo.com/2/statuses/user_timeline.json'</span></span><br><span class="line">        load = &#123;</span><br><span class="line">            <span class="string">'access_token'</span>: <span class="string">'xxxxxxxxxx'</span>,</span><br><span class="line">            <span class="string">'uid'</span>: uid,</span><br><span class="line">            <span class="string">'count'</span>: <span class="number">100</span>,</span><br><span class="line">            <span class="string">'feature'</span>: <span class="number">2</span>,</span><br><span class="line">            <span class="string">'trim_user'</span>: <span class="number">1</span></span><br><span class="line">        &#125;</span><br><span class="line">        get_info = requests.get(url=url, params=load, timeout=(<span class="number">10</span>, <span class="number">10</span>))</span><br><span class="line">        <span class="keyword">if</span> get_info.status_code != <span class="number">200</span>:</span><br><span class="line">            logging.warning(ConnectionError)</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line">        info_json = json.loads(get_info.content)</span><br><span class="line">        info_json[<span class="string">'uid'</span>] = uid</span><br><span class="line">        statuses = info_json[<span class="string">'statuses'</span>]</span><br><span class="line">        <span class="comment"># 处理筛选微博数据</span></span><br><span class="line">        <span class="keyword">for</span> status <span class="keyword">in</span> statuses:</span><br><span class="line">            id = status[<span class="string">'idstr'</span>]</span><br><span class="line">            <span class="keyword">if</span> status[<span class="string">'geo'</span>] <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">                lat = status[<span class="string">'geo'</span>][<span class="string">'coordinates'</span>][<span class="number">0</span>]</span><br><span class="line">                lng = status[<span class="string">'geo'</span>][<span class="string">'coordinates'</span>][<span class="number">1</span>]</span><br><span class="line">                pic_urls = status[<span class="string">'pic_urls'</span>]</span><br><span class="line"></span><br><span class="line">                <span class="comment"># 判断是否在北京</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="number">115.7</span> &lt; lng &lt; <span class="number">117.4</span>) <span class="keyword">and</span> (<span class="number">39.4</span> &lt; lat &lt; <span class="number">41.6</span>):</span><br><span class="line">                    <span class="comment"># 若在北京,插入blog数据进库</span></span><br><span class="line">                    blog_text = status[<span class="string">'text'</span>].replace(<span class="string">'\''</span>, <span class="string">'\'\''</span>)</span><br><span class="line">                    created_time = status[<span class="string">'created_at'</span>]</span><br><span class="line">                    <span class="keyword">try</span>:</span><br><span class="line">                        cursor.execute(</span><br><span class="line">                            insert_blog_sql.format(uid=uid, id=id, blog_text=blog_text, lat=lat, lng=lng,</span><br><span class="line">                                                   created_time=created_time))</span><br><span class="line">                    <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e_blog:</span><br><span class="line">                        logging.warning(e_blog.args[<span class="number">1</span>])</span><br><span class="line">                        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">                    <span class="comment"># conn.commit()</span></span><br><span class="line">                    <span class="comment"># 处理图片</span></span><br><span class="line">                    <span class="keyword">for</span> pic_url <span class="keyword">in</span> pic_urls:</span><br><span class="line">                        <span class="comment"># 获取原图片二进制数据</span></span><br><span class="line">                        pic_bin = handle_pic(pic_url[<span class="string">'thumbnail_pic'</span>])</span><br><span class="line"></span><br><span class="line">                        <span class="comment"># 读取exif 数据</span></span><br><span class="line">                        pic_file = BytesIO(pic_bin)  <span class="comment"># 将二进制数据转化成文件对象便于读取exif数据信息和生成MD5</span></span><br><span class="line">                        tag1 = exifread.process_file(pic_file, details=<span class="keyword">False</span>, strict=<span class="keyword">True</span>)</span><br><span class="line">                        tag = &#123;&#125;</span><br><span class="line">                        <span class="keyword">for</span> key, value <span class="keyword">in</span> tag1.items():</span><br><span class="line">                            <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> (</span><br><span class="line">                                    <span class="string">'JPEGThumbnail'</span>, <span class="string">'TIFFThumbnail'</span>, <span class="string">'Filename'</span>,</span><br><span class="line">                                    <span class="string">'EXIF MakerNote'</span>):  <span class="comment"># 去除四个不必要的exif属性，简化信息量</span></span><br><span class="line">                                tag[key] = str(value)</span><br><span class="line">                        tags = json.dumps(tag)  <span class="comment"># dumps为json类型 此tag即为exif的json数据</span></span><br><span class="line">                        <span class="comment"># 生成MD5</span></span><br><span class="line">                        MD5 = hashlib.md5(pic_file.read()).hexdigest()</span><br><span class="line">                        <span class="comment"># 首先把二进制图片用base64 转成字符串之后再存</span></span><br><span class="line">                        <span class="keyword">try</span>:</span><br><span class="line">                            cursor.execute(</span><br><span class="line">                                insert_pic_sql.format(pic_url=pic_url[<span class="string">'thumbnail_pic'</span>].replace(<span class="string">'thumbnail'</span>, <span class="string">'large'</span>),</span><br><span class="line">                                                      pic_bin=str(base64.b64encode(pic_bin))[<span class="number">2</span>:<span class="number">-1</span>], md5=MD5,</span><br><span class="line">                                                      exif=tags))</span><br><span class="line">                        <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e_pic:</span><br><span class="line">                            logging.warning(e_pic.args[<span class="number">1</span>])</span><br><span class="line">                            <span class="keyword">pass</span></span><br><span class="line">                        <span class="keyword">try</span>:</span><br><span class="line">                            cursor.execute(insert_relationship_sql.format(id=id, md5=MD5))</span><br><span class="line">                        <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e_relation:</span><br><span class="line">                            logging.warning(e_relation)</span><br><span class="line">                            <span class="keyword">pass</span></span><br><span class="line">                        conn.commit()</span><br><span class="line"></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    logging.info(id + <span class="string">" is Not in Beijing"</span>)</span><br><span class="line">                    <span class="keyword">pass</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                logging.info(id + <span class="string">' Geo is null'</span>)</span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e:</span><br><span class="line">        logging.error(e.args[<span class="number">1</span>])</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">judge_conn</span><span class="params">(i)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> conn</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        conn.ping(<span class="keyword">True</span>)</span><br><span class="line">        get_poiid_info(i)</span><br><span class="line">    <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e:</span><br><span class="line">        logging.error(<span class="string">'Reconnect'</span>)</span><br><span class="line">        conn = pymysql.connect(host=db_host, user=db_user, passwd=db_pass, db=db, charset=<span class="string">'utf8'</span>)</span><br><span class="line">        get_poiid_info(i)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_tuple</span><span class="params">(a_tuple)</span>:</span></span><br><span class="line">    read_uid_set = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> a_tuple:</span><br><span class="line">        read_uid_set.append(i[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">return</span> set(read_uid_set)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    sql_find_uid = (</span><br><span class="line">        <span class="string">"SELECT userid FROM blog"</span></span><br><span class="line">    )</span><br><span class="line">    cursor.execute(sql_find_uid)</span><br><span class="line">    read_uid_tuple = cursor.fetchall()</span><br><span class="line">    read_list = handle_tuple(read_uid_tuple)</span><br><span class="line">    print(len(read_list))</span><br><span class="line"></span><br><span class="line">    new_uid = set(uid).difference(read_list)</span><br><span class="line">    print(len(new_uid))</span><br><span class="line"></span><br><span class="line">    pool = Pool()</span><br><span class="line">    pool.map(judge_conn, list(new_uid))</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/通用论坛正文提取/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/22/通用论坛正文提取/" itemprop="url">通用论坛正文提取</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:25:07+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><blockquote>
+<p>参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内容的相似来完成的。(通俗点说就是去噪去噪去噪，然后只留下相对有规律的日期，内容)</p>
+</blockquote>
+<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><ol>
+<li><p>软件和开发环境： Pycharm，Python2.7，Linux系统</p>
+</li>
+<li><p>用的主要Python包： jieba， requests， BeautifulSoup， goose， selenium， PhantomJS， pymongo等(部分软件的安装我前面的博客有介绍)</p>
+</li>
+</ol>
+<h2 id="网页预处理"><a href="#网页预处理" class="headerlink" title="网页预处理"></a>网页预处理</h2><p>首先因为网站很多是动态的，直接用bs4是获取不到有些信息的，所以我们使用selenium和phantomjs将文件保存在本地，然后再处理。</p>
+<p>相关的代码是</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save</span><span class="params">(baseUrl)</span>:</span></span><br><span class="line">    driver = webdriver.PhantomJS()</span><br><span class="line">    driver.get(baseUrl) <span class="comment"># seconds</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        element = WebDriverWait(driver, <span class="number">10</span>).until(isload(driver) <span class="keyword">is</span> <span class="keyword">True</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception, e:</span><br><span class="line">        <span class="keyword">print</span> e</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">        data = driver.page_source  <span class="comment"># 取到加载js后的页面content</span></span><br><span class="line">    driver.quit()</span><br><span class="line">    <span class="keyword">return</span> data</span><br></pre></td></tr></table></figure>
+<p>由于网页中存在着大量的噪音（广告，图片等），首先我们需要将与我们所提取内容不一致的所有噪声尽可能去除。我们首先选择将一些带有典型噪声意义的噪声标签去除，比如script等，方法我们选择BeautifulSoup来完成。</p>
+<p>代码大概是这样</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> element <span class="keyword">in</span> soup(text=<span class="keyword">lambda</span> text: isinstance(text, Comment)):</span><br><span class="line">    element.extract()</span><br><span class="line"></span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'script'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'meta'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'style'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'link'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'img'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'input'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'br'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'li'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'ul'</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> (soup.prettify())</span><br></pre></td></tr></table></figure>
+<p>处理之后的网页对比</p>
+<p><img src="http://111.230.251.140:8000/images/before.png" alt="之前"></p>
+<p><img src="http://111.230.251.140:8000/images/after.png" alt="之后"></p>
+<p>可以看出网页噪声少了很多，但是还是不足以从这么多噪声中提取出我们所要的内容</p>
+<p>由于我们不需要标签只需要标签里面的文字,所以我们可以利用BeautifulSoup提取出文字内容再进行分析</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> string <span class="keyword">in</span> soup.stripped_strings:</span><br><span class="line">    print(string)</span><br><span class="line">    <span class="keyword">with</span> open(os.path.join(os.getcwd())+<span class="string">"/data/3.txt"</span>, <span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.writelines(string.encode(<span class="string">'utf-8'</span>)+<span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="http://111.230.251.140:8000/images/3txt.png" alt="去除噪声标签之后的信息"></p>
+<p>可以看出来还是非常杂乱，但是又是十分有规律的。我们可以发现每个楼层中的文本内容实质上都差不多，可以说重复的很多，而且都是一些特定的词，比如: <strong>直达楼层</strong>, <strong>板凳</strong>,<strong>沙发</strong>,等这类的词，所以我们需要将这些词删掉然后再进行分析</p>
+<p>我所用的方法是利用jieba分词来对获取的网页文本进行分词，统计出出现词频最高的词，同时也是容易出现在噪声文章中的词语，代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba.analyse</span><br><span class="line"></span><br><span class="line">text = open(<span class="string">r"./data/get.txt"</span>, <span class="string">"r"</span>).read()</span><br><span class="line"></span><br><span class="line">dic = &#123;&#125;</span><br><span class="line">cut = jieba.cut_for_search(text)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> fc <span class="keyword">in</span> cut:</span><br><span class="line">    <span class="keyword">if</span> fc <span class="keyword">in</span> dic:</span><br><span class="line">        dic[fc] += <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        dic[fc] = <span class="number">1</span></span><br><span class="line">blog = jieba.analyse.extract_tags(text, topK=<span class="number">1000</span>, withWeight=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> word_weight <span class="keyword">in</span> blog:</span><br><span class="line">    <span class="comment"># print (word_weight[0].encode('utf-8'), dic.get(word_weight[0], 'not found'))</span></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'cut.txt'</span>, <span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.writelines(word_weight[<span class="number">0</span>].encode(<span class="string">'utf-8'</span>) + <span class="string">"    "</span> + str(dic.get(word_weight[<span class="number">0</span>], <span class="string">'not found'</span>)) + <span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+<p>统计出来然后经过我们测试和筛选得出的停用词有这些</p>
+<blockquote>
+<p>回帖<br>积分<br>帖子<br>登录<br>论坛<br>注册<br>离线<br>时间<br>作者<br>签到<br>主题<br>精华<br>客户端<br>手机<br>下载<br>分享</p>
+</blockquote>
+<p>目前统计的词大约200左右。</p>
+<p>然后还有去除重复文本的工作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 去重函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_dup</span><span class="params">(items)</span>:</span></span><br><span class="line">    pattern1 = re.compile(<span class="string">r'发表于'</span>)</span><br><span class="line">    pattern2 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern3 = re.compile(<span class="string">'\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern4 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern5 = re.compile(<span class="string">r'[^0-9a-zA-Z]&#123;7,&#125;'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 用集合来作为容器，来做一部分的重复判断依据，另外的部分由匹配来做</span></span><br><span class="line">    <span class="comment"># yield用于将合适的文本用生成器得到迭代器，这样就进行了文本的删除，在函数外面</span></span><br><span class="line">    <span class="comment"># 可以用函数进行文本的迭代</span></span><br><span class="line">    seen = set()</span><br><span class="line">    <span class="keyword">for</span> item <span class="keyword">in</span> items:</span><br><span class="line">        match1 = pattern1.match(item)</span><br><span class="line">        match2 = pattern2.match(item)</span><br><span class="line">        match3 = pattern3.match(item)</span><br><span class="line">        match4 = pattern4.match(item)</span><br><span class="line">        match5 = pattern5.match(item)</span><br><span class="line">        <span class="keyword">if</span> item <span class="keyword">not</span> <span class="keyword">in</span> seen <span class="keyword">or</span> match1 <span class="keyword">or</span> match2 <span class="keyword">or</span> match3 <span class="keyword">or</span> match4 <span class="keyword">or</span> match5:</span><br><span class="line">            <span class="keyword">yield</span> item</span><br><span class="line">        seen.add(item)  <span class="comment"># 向集合中加入item，集合会自动化删除掉重复的项目</span></span><br></pre></td></tr></table></figure>
+<p>在经过观察处理后的网页文本，我们发现还有一项噪声无法忽略，那就是纯数字。因为网页文本中有很多纯数字但是又不重复，比如<strong>点赞数</strong>等，所以我准备用正则匹配出纯数字然后删除。但是这样就会出现问题…因为有些用户名是纯数字的，这样我们会把用户名删掉的。为了解决这个问题我们使用保留字符数大于7的纯数字，这样既删除了大部分的没用信息又尽可能的保留了用户名</p>
+<p>相关的代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">st = []</span><br><span class="line">    <span class="keyword">for</span> stop_word <span class="keyword">in</span> stop_words:</span><br><span class="line">        st.append(stop_word.strip(<span class="string">'\n'</span>))</span><br><span class="line">    t = tuple(st)</span><br><span class="line">    <span class="comment"># t,元组，和列表的区别是，不能修改使用（，，，，），与【，，，】列表不同</span></span><br><span class="line">    lines = []</span><br><span class="line">    <span class="comment"># 删除停用词和短数字实现</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> after_string:</span><br><span class="line">        <span class="comment"># 如果一行的开头不是以停用词开头，那么读取这一行</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> j.startswith(t):</span><br><span class="line">            <span class="comment"># 如何一行不全是数字，或者这行的数字数大于7（区别无关数字和数字用户名）读取这一行</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> re.match(<span class="string">'\d+$'</span>, j) <span class="keyword">or</span> len(j) &gt; <span class="number">7</span>:</span><br><span class="line">                lines.append(j.strip())</span><br><span class="line">                <span class="comment"># 删除所有空格并输出</span></span><br><span class="line">                <span class="keyword">print</span> (j.strip())</span><br></pre></td></tr></table></figure>
+<p>处理之后的文本如下，规律十分明显了</p>
+<p><img src="http://111.230.251.140:8000/images/aftertxt.png" alt="去除噪声标签之后的信息"></p>
+<p>接下来就是我们进行内容提取的时候了</p>
+<h2 id="内容提取"><a href="#内容提取" class="headerlink" title="内容提取"></a>内容提取</h2><p>内容提取无非是找到评论块，而评论块在上面我们的图中已经十分清晰了，我们自然而然的想到根据日期来区分评论块。经过观察，所有的论坛中日期的形式只有5种（目前只看到5种，当然后期可以加上）。我们可以用正则匹配出日期所在的行，根据两个日期所在行数的中间所夹的就是评论内容和用户名来完成我们的评论内容提取。</p>
+<p>传入我们处理后的文本然后就匹配出日期所在行数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配日期返回get_list</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">match_date</span><span class="params">(lines)</span>:</span></span><br><span class="line">    pattern1 = re.compile(<span class="string">r'发表于'</span>)</span><br><span class="line">    pattern2 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern3 = re.compile(<span class="string">'\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern4 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern5 = re.compile(<span class="string">r'发表日期'</span>)</span><br><span class="line"></span><br><span class="line">    pre_count = <span class="number">-1</span></span><br><span class="line">    get_list = []</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 匹配日期文本</span></span><br><span class="line">    <span class="keyword">for</span> string <span class="keyword">in</span> lines:</span><br><span class="line">        match1 = pattern1.match(string)</span><br><span class="line">        match2 = pattern2.match(string)</span><br><span class="line">        match3 = pattern3.match(string)</span><br><span class="line">        match4 = pattern4.match(string)</span><br><span class="line">        match5 = pattern5.match(string)</span><br><span class="line">        pre_count += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> match1 <span class="keyword">or</span> match2 <span class="keyword">or</span> match3 <span class="keyword">or</span> match4 <span class="keyword">or</span> match5:</span><br><span class="line">            get_dic = &#123;<span class="string">'count'</span>: pre_count, <span class="string">'date'</span>: string&#125;</span><br><span class="line">            get_list.append(get_dic)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 返回的是匹配日期后的信息</span></span><br><span class="line">    <span class="keyword">return</span> get_list</span><br></pre></td></tr></table></figure>
+<p>因为有回帖和没有回帖处理方式也不一样所以我们需要分类进行讨论。因为我们知道评论的内容是在两个匹配日期的中间，这样就有一个问题就是最后一个评论的内容区域不好分。但是考虑到大部分的最后一个回帖都是一行我们可以暂取值为3（sub==3，考虑一行评论和一行用户名），后来想到一种更为科学的方法，比如判断后面几行的文本密度，如果很小说明只有一行评论的可能性更大。</p>
+<p>下面的代码是获取日期所在行数和两个日期之间的行数差</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回my_count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_count</span><span class="params">(get_list)</span>:</span></span><br><span class="line">    my_count = []</span><br><span class="line">    date = []</span><br><span class="line">    <span class="comment"># 获取时间所在行数</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> get_list:</span><br><span class="line">        k, t = i.get(<span class="string">'count'</span>), i.get(<span class="string">'date'</span>)</span><br><span class="line">        my_count.append(k)</span><br><span class="line">        date.append(t)</span><br><span class="line">    <span class="keyword">if</span> len(get_list) &gt; <span class="number">1</span>:</span><br><span class="line">        <span class="comment"># 最后一行暂时取3</span></span><br><span class="line">        my_count.append(my_count[<span class="number">-1</span>] + <span class="number">3</span>)</span><br><span class="line">        <span class="keyword">return</span> my_count</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> my_count</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取两个时间所在的行数差</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_sub</span><span class="params">(my_count)</span>:</span></span><br><span class="line">    sub = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(my_count) - <span class="number">1</span>):</span><br><span class="line">        sub.append(my_count[i + <span class="number">1</span>] - my_count[i])</span><br><span class="line">    <span class="keyword">return</span> sub</span><br></pre></td></tr></table></figure>
+<p>接下来就要分类讨论了</p>
+<ol>
+<li><p>如果只有楼主没有评论（即my——count==1），这个时候我们可以使用开源的正文提取软件goose来提取正文。</p>
+</li>
+<li><p>如果有评论我们就需要根据sub的值来进行分类如果sub==2占多数（或者说比sub==3）占的多，那么我们就认为可能是用户名被删掉，删掉的原因有很多，比如去重的时候有人在楼中楼回复了导致用户名重复被删除，有可能该网站的标签比较特殊用户名在去标签的时候删除等，情况比较复杂且出现的频率不太高，暂未考虑。何况不影响我们提取评论内容，只需分类出来考虑就行</p>
+</li>
+</ol>
+<font color="#FF0000" size="4" face="黑体"><br>注意：下面余弦相似度这个是我开始的时候想多了！大部分情况就是：日期-评论-用户名，后来我没有考虑余弦相似度分类，代码少了，精度也没有下降。这里不删是想留下一个思考的过程。代码看看就好，最后有修改后的源码。<br></font>
+
+<ol>
+<li>还有就是最常见的内容，就是sub==3占多数的情况。因为大部分的评论都是一行文本，所以我们需要考虑的的是sub==3的时候获取的评论文本在哪一行。通俗来说就是这三行的内容是<strong>日期-评论-用户名</strong>，还是<strong>日期-用户名-评论</strong>呢？虽然大部分是第一种情况，但是第二种情况我们也不能忽略。怎么判断这两种情况呢？这确实让我思考了很长一段时间，后来想到可以用余弦相似度来解决这个问题.科普余弦相似度可以看<a href="http://www.ruanyifeng.com/blog/2013/03/cosine_similarity.html" target="_blank" rel="noopener">这里</a>。简单来说就是用户名的长度都是相似的，但是评论的内容长度差异就非常大了。比如用户名长度都是7个字符左右，但是评论的长度可以数百，也可以只有一个。所以我们可以两两比较余弦相似度，然后取平均，相似度大的就是用户名了。这样我们就可以区分出评论内容进行提取了！这就是主要的思想。剩下的就是代码的实现了。</li>
+</ol>
+<p>简单贴一下相关的代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 利用goose获取正文内容</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">goose_content</span><span class="params">(my_count, lines, my_url)</span>:</span></span><br><span class="line">    g = Goose(&#123;<span class="string">'stopwords_class'</span>: StopWordsChinese&#125;)</span><br><span class="line">    content_1 = g.extract(url=my_url)</span><br><span class="line">    host = &#123;&#125;</span><br><span class="line">    my_list = []</span><br><span class="line">    host[<span class="string">'content'</span>] = content_1.cleaned_text</span><br><span class="line">    host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">    host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">    result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">    SpiderBBS_info.insert(result)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算余弦相似度函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cos_dist</span><span class="params">(a, b)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> len(a) != len(b):</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    part_up = <span class="number">0.0</span></span><br><span class="line">    a_sq = <span class="number">0.0</span></span><br><span class="line">    b_sq = <span class="number">0.0</span></span><br><span class="line">    <span class="keyword">for</span> a1, b1 <span class="keyword">in</span> zip(a, b):</span><br><span class="line">        part_up += a1 * b1</span><br><span class="line">        a_sq += a1 ** <span class="number">2</span></span><br><span class="line">        b_sq += b1 ** <span class="number">2</span></span><br><span class="line">    part_down = math.sqrt(a_sq * b_sq)</span><br><span class="line">    <span class="keyword">if</span> part_down == <span class="number">0.0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> part_up / part_down</span><br><span class="line"></span><br><span class="line"><span class="comment"># 判断评论内容在哪一行（可能在3行评论块的中间，可能在三行评论块的最后）</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_3_comment</span><span class="params">(my_count, lines)</span>:</span></span><br><span class="line">    get_pd_1 = []</span><br><span class="line">    get_pd_2 = []</span><br><span class="line">    <span class="comment"># 如果间隔为3取出所在行的文本长度</span></span><br><span class="line">    test_sat_1 = []</span><br><span class="line">    test_sat_2 = []</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(len(my_count)<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">if</span> my_count[num+<span class="number">1</span>] - <span class="number">3</span> == my_count[num]:</span><br><span class="line">            pd_1 = (len(lines[my_count[num]]), len(lines[my_count[num]+<span class="number">2</span>]))</span><br><span class="line">            get_pd_1.append(pd_1)</span><br><span class="line">            pd_2 = (len(lines[my_count[num]]), len(lines[my_count[num]+<span class="number">1</span>]))</span><br><span class="line">            get_pd_2.append(pd_2)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i_cos <span class="keyword">in</span> range(len(get_pd_1)<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">for</span> j_cos <span class="keyword">in</span> range(i_cos+<span class="number">1</span>, len(get_pd_1)):</span><br><span class="line">            <span class="comment"># 计算文本余弦相似度</span></span><br><span class="line">            test_sat_1.append(cos_dist(get_pd_1[j_cos], get_pd_1[i_cos]))</span><br><span class="line">            test_sat_2.append(cos_dist(get_pd_2[j_cos], get_pd_2[i_cos]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算余弦相似度的平均值</span></span><br><span class="line">    get_mean_1 = numpy.array(test_sat_1)</span><br><span class="line">    <span class="keyword">print</span> (get_mean_1.mean())</span><br><span class="line">    get_mean_2 = numpy.array(test_sat_2)</span><br><span class="line">    <span class="keyword">print</span> (get_mean_2.mean())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 比较大小返回是否应该按</span></span><br><span class="line">    <span class="keyword">if</span> get_mean_1.mean() &gt;= get_mean_2.mean():</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">elif</span> get_mean_1.mean() &lt; get_mean_2.mean():</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取评论内容</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">solve__3</span><span class="params">(num, my_count, sub, lines, my_url)</span>:</span></span><br><span class="line">    <span class="comment"># 如果get_3_comment()返回的值是1，那么说明最后一行是用户名的可能性更大，否则第一行是用户名的可能性更大</span></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">1</span>:</span><br><span class="line">        host = &#123;&#125;</span><br><span class="line">        my_list = []</span><br><span class="line">        host[<span class="string">'content'</span>] = <span class="string">''</span>.join(lines[my_count[<span class="number">0</span>]+<span class="number">1</span>: my_count[<span class="number">1</span>]+sub[<span class="number">0</span>]<span class="number">-1</span>])</span><br><span class="line">        host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">        host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">        <span class="keyword">for</span> use <span class="keyword">in</span> range(<span class="number">1</span>, len(my_count)<span class="number">-1</span>):</span><br><span class="line">            pl = &#123;<span class="string">'content'</span>: <span class="string">''</span>.join(lines[my_count[use] + <span class="number">1</span>:my_count[use + <span class="number">1</span>] - <span class="number">1</span>]), <span class="string">'date'</span>: lines[my_count[use]],</span><br><span class="line">                  <span class="string">'title'</span>: get_title(my_url)&#125;</span><br><span class="line">            my_list.append(pl)</span><br><span class="line"></span><br><span class="line">        result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">        SpiderBBS_info.insert(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">2</span>:</span><br><span class="line">        host = &#123;&#125;</span><br><span class="line">        my_list = []</span><br><span class="line">        host[<span class="string">'content'</span>] = <span class="string">''</span>.join(lines[my_count[<span class="number">0</span>]+<span class="number">2</span>: my_count[<span class="number">1</span>]+sub[<span class="number">0</span>]])</span><br><span class="line">        host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">        host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">        <span class="keyword">for</span> use <span class="keyword">in</span> range(<span class="number">1</span>, len(my_count) - <span class="number">1</span>):</span><br><span class="line">            pl = &#123;<span class="string">'content'</span>: <span class="string">''</span>.join(lines[my_count[use] + <span class="number">2</span>:my_count[use + <span class="number">1</span>]]), <span class="string">'date'</span>: lines[my_count[use]],</span><br><span class="line">                  <span class="string">'title'</span>: get_title(my_url)&#125;</span><br><span class="line">            my_list.append(pl)</span><br><span class="line"></span><br><span class="line">        result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">        SpiderBBS_info.insert(result)</span><br></pre></td></tr></table></figure>
+<h2 id="展望"><a href="#展望" class="headerlink" title="展望"></a>展望</h2><p>提取的准确率应该要分析更多的bbs网站，优化删除重复词（太粗暴），优化停用词，针对短文本没回复情况的优化，准确提取楼主的用户名等，无奈时间太紧无法进一步优化。才疏学浅，刚学了几个月python，代码难免有不合理的地方，望各位提出宝贵意见。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/利用新浪API实现数据抓取/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/22/利用新浪API实现数据抓取/" itemprop="url">利用新浪API实现数据抓取</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:22:13+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+<h1 id="利用新浪API实现数据的抓取"><a href="#利用新浪API实现数据的抓取" class="headerlink" title="利用新浪API实现数据的抓取"></a><strong>利用新浪API实现数据的抓取</strong></h1><h3 id="1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。"><a href="#1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。" class="headerlink" title="1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。　"></a><strong><em>1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。</em></strong>　</h3><p><img src="http://111.230.251.140:8000/images/result.png" alt="注册新浪微博" title="结果"><br><br></p>
+<p>我主要抓取了大概4天的数据，图上可以看的出来大概有360万条数据，由于是在自己的电脑上爬取做数据的，有时候晚上断网了就间断了，所以大概一天可以爬取有100万左右的<strong>最新微博数据</strong>（因为我调用的是最新的微博API　<a href="http://open.weibo.com/wiki/2/statuses/public_timeline" target="_blank" rel="noopener">public_timeline</a>)</p>
+<p>API文档当中定义了很多返回的类型（以json数据格式返回，我选取了一些我认为重要的信息抓取下来<em>如图所示</em>:　大概有<strong>id号</strong>，<strong>所在位置</strong>，<strong>粉丝数</strong>，发的<strong>微博内容</strong>，发微博的<strong>时间</strong>等等。　当然这些数据都可以根据自己的需要进行定制。)</p>
+<h4 id="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦"><a href="#大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦" class="headerlink" title="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦"></a>大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦</h4><h3 id="2-前期准备"><a href="#2-前期准备" class="headerlink" title="2.　前期准备　"></a><strong><em>2.　前期准备</em></strong>　</h3><p><strong>我们需要的东西：</strong></p>
+<ul>
+<li>数据库:　mongodb（可以使用客户端<a href="https://mongobooster.com/downloads" target="_blank" rel="noopener">MongoBooster</a>)</li>
+<li>开发环境：　Python2.7(我用的IDE是<a href="https://www.jetbrains.com/pycharm/" target="_blank" rel="noopener">Pycharm</a>)</li>
+<li>一个新浪开发者账号：　用自己的新浪微博账号注册就行（后面会讲）</li>
+<li>需要的库：　<a href="http://github.liaoxuefeng.com/sinaweibopy/" target="_blank" rel="noopener">sinaweibopy</a>和pymongo(这些都可以在Pycharm中下载)</li>
+</ul>
+<h4 id="2-1-mongodb的安装"><a href="#2-1-mongodb的安装" class="headerlink" title="2.1　mongodb的安装"></a>2.1　mongodb的安装</h4><p>MongoDB是一个高性能，开源，无模式的文档型数据库，是当前NoSql数据库中比较热门的一种。它在许多场景下可用于替代传统的关系型数据库或键/值存储方式。Mongo使用C++开发。Mongo的官方网站地址是：<a href="http://www.mongodb.org/" target="_blank" rel="noopener">http://www.mongodb.org/</a>，读者可以在此获得更详细的信息。</p>
+<blockquote>
+<p>小插曲：什么是NoSql?</p>
+<p>　　NoSql，全称是 Not Only Sql,指的是非关系型的数据库。下一代数据库主要解决几个要点：非关系型的、分布式的、开源的、水平可扩展的。原始的目的是为了大规模web应用，这场运动开始于2009年初，通常特性应用如：模式自由、支持简易复制、简单的API、最终的一致性（非ACID）、大容量数据等。NoSQL被我们用得最多的当数key-value存储，当然还有其他的文档型的、列存储、图型数据库、xml数据库等。</p>
+</blockquote>
+<h4 id="网上有很多安装mongodb教程我就不写了"><a href="#网上有很多安装mongodb教程我就不写了" class="headerlink" title="网上有很多安装mongodb教程我就不写了"></a>网上有很多安装mongodb教程我就不写了</h4><p><a href="http://www.runoob.com/mongodb/mongodb-window-install.html" target="_blank" rel="noopener">Windows下mongodb的安装</a></p>
+<p><a href="http://www.runoob.com/mongodb/mongodb-linux-install.html" target="_blank" rel="noopener">Linux下mongodb的安装</a></p>
+<h4 id="2-2-新浪开发者账号的注册方法"><a href="#2-2-新浪开发者账号的注册方法" class="headerlink" title="2.2　新浪开发者账号的注册方法"></a>2.2　新浪开发者账号的注册方法</h4><ul>
+<li><strong>注册新浪微博账号（163邮箱、手机号）</strong></li>
+</ul>
+<p><img src="http://111.230.251.140:8000/images/sina1.png" alt="注册新浪微博" title="注册新浪微博"></p>
+<p>　　<strong> 创建完毕需要填写手机号验证 </strong><br><br></p>
+<ul>
+<li><strong>进入新浪开放者平台：<a href="http://open.weibo.com/" target="_blank" rel="noopener">http://open.weibo.com/</a></strong></li>
+</ul>
+<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
+<p><img src="http://111.230.251.140:8000/images/sina3.png" alt="sina"><br><br></p>
+<p><img src="http://111.230.251.140:8000/images/sina4.png" alt="sina"></p>
+<ul>
+<li><strong>点击继续创建</strong></li>
+</ul>
+<p>初次创建应用需要填写如下信息：</p>
+<p><img src="http://111.230.251.140:8000/images/sina5.png" alt="sina"></p>
+<p>此页面信息不需要填写真实信息，如地区，电话，可随意填写。网站填<a href="https://www.baidu.com/" target="_blank" rel="noopener">https://www.baidu.com/</a>即可。(邮箱要真实)</p>
+<p>继续创建应用。应用名称自定义，平台如下勾选 ios 、andrioid</p>
+<p><img src="http://111.230.251.140:8000/images/sina6.png" alt="sina"></p>
+<p>创建完毕直接返回继续创建，一个账号可以创建10个应用，每个应用对应一个access-token(事实上我只用了一个就可以满足需求)</p>
+<ul>
+<li><strong>前往<a href="http://open.weibo.com/tools/console" target="_blank" rel="noopener">API测试平台</a></strong></li>
+</ul>
+<p><img src="http://111.230.251.140:8000/images/sina7.png" alt="sina"><br><br></p>
+<p><img src="http://111.230.251.140:8000/images/sina8.png" alt="sina"><br><br></p>
+<p>依次选取创建的应用。点<img src="http://111.230.251.140:8000/images/sina9.png" alt="sina">将下方的token用txt保存即可。</p>
+<ul>
+<li><strong>获取key</strong></li>
+</ul>
+<p>回到</p>
+<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
+<p>点击<strong>我的应用</strong></p>
+<p>然后选择自己刚刚创建的应用</p>
+<p><img src="http://111.230.251.140:8000/images/sina10.png" alt="sina"></p>
+<p>进入之后点击<strong>应用信息</strong></p>
+<p><img src="http://111.230.251.140:8000/images/sina11.png" alt="sina"></p>
+<p>保存下　<strong>APP Key</strong> 和　<strong>APP Secret</strong></p>
+<p>点击<strong>高级信息</strong></p>
+<p>设置回调网址</p>
+<p><img src="http://111.230.251.140:8000/images/sina12.png" alt="sina"></p>
+<p>可以设置成默认的<br><a href="http://api.weibo.com/oauth2/default.html" target="_blank" rel="noopener">http://api.weibo.com/oauth2/default.html</a></p>
+<p>至此你的开发者账号就已经完成了</p>
+<h4 id="2-3-依赖库的安装方法"><a href="#2-3-依赖库的安装方法" class="headerlink" title="2.3　依赖库的安装方法"></a>2.3　依赖库的安装方法</h4><p><a href="http://github.liaoxuefeng.com/sinaweibopy/" target="_blank" rel="noopener">sinaweibopy</a>和pymongo的安装</p>
+<p>可以直接用pip安装<br><strong>pip install sinaweibopy</strong>　和　<strong>pip install pymongo</strong></p>
+<p>也可以在Pycharm里面直接安装</p>
+<p>选择File -&gt; Settings -&gt; Project -&gt; Project Interpreter</p>
+<p><img src="http://111.230.251.140:8000/images/Screenshot from 2016-12-18 10-56-56.png" alt="Pycharm"></p>
+<p>可以看到自己安装的Python库，点击右边的绿色<strong>　＋　</strong> 号</p>
+<p><img src="http://111.230.251.140:8000/images/Screenshot from 2016-12-18 11-02-00.png" alt="Pycharm"></p>
+<p>安装即可</p>
+<h3 id="3-分析问题"><a href="#3-分析问题" class="headerlink" title="3.　分析问题　"></a><strong><em>3.　分析问题</em></strong>　</h3><h4 id="3-1-OAuth-认证"><a href="#3-1-OAuth-认证" class="headerlink" title="3.1 OAuth 认证"></a><strong>3.1 OAuth 认证</strong></h4><p><strong> 授权机制说明（很重要）</strong></p>
+<p>网上很多讲利用新浪微博API发送微博什么的都是使用的<strong>请求用户授权Token</strong>这种方式，但是这种方式显然不适用于我们爬取数据，因为每次都要请求，每次都要重新获取code。具体可参考<a href="http://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6%E8%AF%B4%E6%98%8E" target="_blank" rel="noopener">新浪微博API的授权机制</a></p>
+<p>廖雪峰老师(sinaweibopy 的贡献者）也对这个授权机制有一个说明</p>
+<blockquote>
+<p>通过新浪微博的API接入网站，由于用户无需在您的网站上注册，就可以直接?使用他／她在新浪微博的帐号和口令登录您的网站，这就需要确保您的网站在无需知道，也不能知道用户口令的情况下确认用户已经登录成功。由于用户的口令存储在新浪微博，因此，认证用户的过程只能由新浪微博完成，但新浪微博如何与您的网站通信并告知您用户是否登录成功呢？这个过程称之为第三方登录，OAuth是一个标准的第三方登录协议，借助OAuth，您的网站就可以安全地接入来自新浪微博登录成功的用户。</p>
+<p>OAuth目前主要有1.0和2.0两个版本，2.0版对1.0版做了大量简化，API也更简单。新浪微博最新的API也是采用的OAuth 2.0，整个登录流程如下：</p>
+<ol>
+<li>用户在您的网站上点击“使用新浪微博登录”，您的网站将用户重定向到新浪微博的OAuth认证页，重定向链接中包含client_id参数作为您的网站ID，redirect_uri参数告诉新浪微博当用户登录成功后，将浏览器重定向到您的网站；</li>
+<li>用户在新浪微博的认证页输入帐号和口令；</li>
+<li>新浪微博认证成功后，将浏览器重定向到您的网站，并附上code参数；</li>
+<li>您的网站通过code参数向新浪微博请求用户的access token；</li>
+<li>您的网站拿到用户的access token后，用户登录完成。<br>OAuth的access token是提供认证服务的网站（例如新浪微博）生成的令牌，代表一个用户认证信息。在随后的API调用中，传入该access token就代表这个登录用户，这样，通过OAuth协议，您的网站将验证用户的步骤交给新浪微博完成，并由新浪微博告知您用户是否登录成功。</li>
+</ol>
+<p>OAuth的安全性是通过步骤4完成的，通过code参数获取access token的过程是您的网站后台到新浪微博网站完成的，用户无法看到获取access token的HTTP请求。如果用户传入伪造的code，则新浪微博会返回一个错误。</p>
+</blockquote>
+<p>具体内容请看<a href="http://www.liaoxuefeng.com/article/00137389308005720bf24cb6cf14d9e897e7026dbc6a842000" target="_blank" rel="noopener">廖雪峰老师的文档</a></p>
+<p>大致上来说按照一般的请求用户授权Token调用会出现这种情况：</p>
+<p><img src="http://111.230.251.140:8000/images/sina14.png" alt="登录微博" title="登录微博"><br><br></p>
+<p><img src="http://111.230.251.140:8000/images/sina13.png" alt="获取code" title="获取code"></p>
+<p>登陆后会调转到一个连接<a href="https://api.weibo.com/oauth2/default.html?code=××××××××" target="_blank" rel="noopener">https://api.weibo.com/oauth2/default.html?code=××××××××</a>　</p>
+<p>我们所需要的就是code=××××××××××　的值</p>
+<h4 id="也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站"><a href="#也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站" class="headerlink" title="也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站　"></a><strong>也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站</strong>　</h4><p>怎么解决问题呢？首先我们想到的自然是在Python程序里面模拟登录新浪微博，然后自然可以获取到code的值，但是，模拟新浪微博登录相对来说比较复杂，而且既然都模拟登录成功了，为啥还要调用API呢…直接自定义进行抓取不是更加方便。</p>
+<p><strong>如果看了上面的那个授权机制，就应该想到。这个时候就需要我们之前申请的access-token了</strong></p>
+<p>access-token 根据我的理解就是把你的微博授权给了第三方让他帮你做一些事情，类似于在你的手机端通过新浪微博来登录然后进行操作(利用上面授权机制里面讲的一句话来说就是)<em>移动端应用可直接使用官方移动SDK，通过呼起微博客户端（未安装微博客户端的会呼起H5授权页）方式授权</em></p>
+<p>这个界面你应该很熟悉</p>
+<p><img src="http://111.230.251.140:8000/images/sina15.png" alt="新浪授权" title="新浪授权"></p>
+<p>新浪也给出了说明<a href="http://open.weibo.com/wiki/Oauth2/access_token" target="_blank" rel="noopener">Oauth2/access token</a></p>
+<p>查看廖雪峰老师的<a href="https://github.com/michaelliao/sinaweibopy/blob/master/weibo.py" target="_blank" rel="noopener">sinaweibopy</a>可以看到set_access_token函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def set_access_token(self, access_token, expires):</span><br><span class="line">        self.access_token = str(access_token)</span><br><span class="line">        self.expires = float(expires)</span><br></pre></td></tr></table></figure></p>
+<p>可以看出access_token　已经有了，还差expires</p>
+<p>这个expires指的是什么<br>同样新浪也给了一个说明<a href="http://open.weibo.com/wiki/Oauth2/get_token_info" target="_blank" rel="noopener">oauth2/get_token_info</a></p>
+<p>查询用户access_token的授权相关信息，包括授权时间，过期时间和scope权限。</p>
+<p>分析到这全部结束了，我们只需要获取４个数据就可以完成所有的操作。<br>APP_KEY　　APP_SECRET　　CALL_BACK　　ACCESS_TOKEN</p>
+<h3 id="４-代码实现"><a href="#４-代码实现" class="headerlink" title="４.　代码实现　"></a><strong><em>４.　代码实现</em></strong>　</h3><p>首先我们先新建一个Python文件命名为InitClient.py<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> weibo</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myAPIClient</span><span class="params">(weibo.APIClient)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, app_key, app_secret, redirect_uri, access_token)</span>:</span></span><br><span class="line">        weibo.APIClient.__init__(self, app_key, app_secret, redirect_uri, access_token)</span><br><span class="line"></span><br><span class="line"><span class="comment">#获取expire的值</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">request_access_token_info</span><span class="params">(self, access_token)</span>:</span></span><br><span class="line">        r = weibo._http_post(<span class="string">'%s%s'</span> % (self.auth_url, <span class="string">'get_token_info'</span>), access_token=access_token)</span><br><span class="line">        current = int(time.time())</span><br><span class="line">        expires = r.expire_in + current</span><br><span class="line">        <span class="keyword">return</span> weibo.JsonDict(expires_in=expires)</span><br><span class="line"></span><br><span class="line">＃获取权限</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_client</span><span class="params">(appkey, appsecret, callback, access_token)</span>:</span></span><br><span class="line">    client = myAPIClient(appkey, appsecret, callback, access_token)</span><br><span class="line">    r = client.request_access_token_info(access_token)</span><br><span class="line">    expires_in = r.expires_in</span><br><span class="line">    client.set_access_token(access_token, expires_in)</span><br><span class="line">    <span class="keyword">return</span> client</span><br></pre></td></tr></table></figure></p>
+<p>代码不长，函数名啊什么的写的很清楚，应该不难看懂…</p>
+<p>接下来就是利用API来获取数据了：新建一个文件weibo.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> InitClient</span><br><span class="line"><span class="keyword">from</span> pymongo <span class="keyword">import</span> MongoClient</span><br><span class="line"></span><br><span class="line">APP_KEY = <span class="string">'4205885419'</span></span><br><span class="line">APP_SECRET = <span class="string">'892c885ff32a4b452be58cda23c1cea6'</span></span><br><span class="line">CALL_BACK = <span class="string">'http://api.weibo.com/oauth2/default.html'</span></span><br><span class="line">ACCESS_TOKEN = <span class="string">'2.00GrlpNEwp7azCa0cf771a73RorfEE'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">()</span>:</span></span><br><span class="line"><span class="comment">#授权</span></span><br><span class="line">    client = InitClient.get_client(APP_KEY, APP_SECRET, CALL_BACK, ACCESS_TOKEN)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line"><span class="comment">#调用statuses__public_timeline的api接口</span></span><br><span class="line">        statuses = client.statuses__public_timeline()[<span class="string">'statuses'</span>]</span><br><span class="line">        length = len(statuses)</span><br><span class="line"><span class="comment">#这是后来我为了查看获取微博条数设置的</span></span><br><span class="line">        <span class="keyword">print</span> length</span><br><span class="line"></span><br><span class="line"><span class="comment">#连接mongodb,不需要本地的额外配置</span></span><br><span class="line">        Monclient = MongoClient(<span class="string">'localhost'</span>, <span class="number">27017</span>)</span><br><span class="line">        db = Monclient[<span class="string">'Weibo'</span>]</span><br><span class="line">＃为什么取名叫做HadSelected？是因为刚开始的时候没有去重，这是改之后的名字</span><br><span class="line">        WeiboData = db[<span class="string">'HadSelected'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#获取的各个数据名应该可以清楚的看出来对应的是什么数据</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, length):</span><br><span class="line">            created_at = statuses[i][<span class="string">'created_at'</span>]</span><br><span class="line">            id = statuses[i][<span class="string">'user'</span>][<span class="string">'id'</span>]</span><br><span class="line">            province = statuses[i][<span class="string">'user'</span>][<span class="string">'province'</span>]</span><br><span class="line">            city = statuses[i][<span class="string">'user'</span>][<span class="string">'city'</span>]</span><br><span class="line">            followers_count = statuses[i][<span class="string">'user'</span>][<span class="string">'followers_count'</span>]</span><br><span class="line">            friends_count = statuses[i][<span class="string">'user'</span>][<span class="string">'friends_count'</span>]</span><br><span class="line">            statuses_count = statuses[i][<span class="string">'user'</span>][<span class="string">'statuses_count'</span>]</span><br><span class="line">            url = statuses[i][<span class="string">'user'</span>][<span class="string">'url'</span>]</span><br><span class="line">            geo = statuses[i][<span class="string">'geo'</span>]</span><br><span class="line">            comments_count = statuses[i][<span class="string">'comments_count'</span>]</span><br><span class="line">            reposts_count = statuses[i][<span class="string">'reposts_count'</span>]</span><br><span class="line">            nickname = statuses[i][<span class="string">'user'</span>][<span class="string">'screen_name'</span>]</span><br><span class="line">            desc = statuses[i][<span class="string">'user'</span>][<span class="string">'description'</span>]</span><br><span class="line">            location = statuses[i][<span class="string">'user'</span>][<span class="string">'location'</span>]</span><br><span class="line">            text = statuses[i][<span class="string">'text'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#插入mongodb</span></span><br><span class="line">            WeiboData.insert_one(&#123;</span><br><span class="line">                <span class="string">'created_at'</span>: created_at,</span><br><span class="line">                <span class="string">'id'</span>: id,</span><br><span class="line">                <span class="string">'nickname'</span>: nickname,</span><br><span class="line">                <span class="string">'text'</span>: text,</span><br><span class="line">                <span class="string">'province'</span>: province,</span><br><span class="line">                <span class="string">'location'</span>: location,</span><br><span class="line">                <span class="string">'description'</span>: desc,</span><br><span class="line">                <span class="string">'city'</span>: city,</span><br><span class="line">                <span class="string">'followers_count'</span>: followers_count,</span><br><span class="line">                <span class="string">'friends_count'</span>: friends_count,</span><br><span class="line">                <span class="string">'statuses_count'</span>: statuses_count,</span><br><span class="line">                <span class="string">'url'</span>: url,</span><br><span class="line">                <span class="string">'geo'</span>: geo,</span><br><span class="line">                <span class="string">'comments_count'</span>: comments_count,</span><br><span class="line">                <span class="string">'reposts_count'</span>: reposts_count</span><br><span class="line">                &#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    run()</span><br></pre></td></tr></table></figure>
+<p>刚开始我的代码是这样的，看起来已经完成了。</p>
+<p>但是，因为新浪会限制你的调用次数，后来我试了一下重新运行,结果发现了一个问题，我之前的<em>print length</em> 出来的每行获取值都不一样，总是在１６－２０之间徘徊，<strong>这说明了我每次重新运行获取的数据都不一样</strong>.然后我想算了，干脆写个<strong>死循环</strong>看他什么时候再被封吧。于是代码就变成了下面这样</p>
+<p>把<del>run()</del>删除，换成下面这个死循环。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line">      　<span class="keyword">try</span>:</span><br><span class="line">          　run()</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>结果他就一直运行下去了…运行了四天还没有被封，估计是封不了了…</p>
+<p>开始我发现一天可以获取800万的数据，把我给乐的…后来发现好多好多重复的数据。最后找了半天的解决方案，在mongodb中根据用户的id和创建的时间这两点建立索引(因为一个人不可能在同一时刻发送两条微博),最后没有重复数据大概一天可以获取100万条左右的信息。但是这总共不到100行的代码，这样就不错了（虽然代码写的很丑）…</p>
+<h3 id="诚挚希望有缘人看到把我这个投-wu-机-bi-取-chou-巧-lou-的代码优化下…感激不尽"><a href="#诚挚希望有缘人看到把我这个投-wu-机-bi-取-chou-巧-lou-的代码优化下…感激不尽" class="headerlink" title="诚挚希望有缘人看到把我这个投(wu)机(bi)取(chou)巧(lou)的代码优化下…感激不尽"></a>诚挚希望有缘人看到把我这个投(wu)机(bi)取(chou)巧(lou)的代码优化下…感激不尽</h3>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/Generic-Algorithm/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -568,7 +1345,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -579,7 +1356,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -590,7 +1367,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
