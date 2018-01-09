@@ -252,6 +252,163 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/04/2018年使用ipv6-XX-net翻墙/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/04/2018年使用ipv6-XX-net翻墙/" itemprop="url">2018年使用ipv6 XX-net翻墙</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-04T15:52:00+08:00">
+                2018-01-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web/" itemprop="url" rel="index">
+                    <span itemprop="name">Web</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="2018年ubuntu使用XXnet"><a href="#2018年ubuntu使用XXnet" class="headerlink" title="#2018年ubuntu使用XXnet  "></a>#2018年ubuntu使用XXnet  </h2><p><em>从大概两个月前开始，xx-net开始不好用了，几乎所有的ipv4的ip都被封锁了没有办法上网，所以很长一段时间我告别了它，openvpn成了我的最后的伙伴（很多其他的手机vpn软件也开始失效了)</em><br><em>但是今天我终于通过使用ipv6借助xx-net又能翻出围墙了</em></p>
+<h2 id="1、准备工作"><a href="#1、准备工作" class="headerlink" title="1、准备工作"></a>1、准备工作</h2><ol>
+<li>下载最新版的<a href="https://github.com/XX-net/XX-Net/blob/master/code/default/download.md" target="_blank" rel="noopener">xx-net</a>  </li>
+<li>在ubuntu下安装miredo， miredo提供一种 IPv6/IPv4转换技术，它让只能访问ipv4的网络用户能够体验到ipv6的网络。当然如果你的网络运营商已经提供了ipv6服务那你就大可不必装这个软件了。（<a href="http://test-ipv6.com/" target="_blank" rel="noopener">查看是否支持ipv6</a>）</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装miredo</span><br><span class="line">sudo apt install miredo </span><br><span class="line"><span class="meta">#</span> 并且启动miredo，默认不是开机启动项，所以每次重新开机以后都要重新启动</span><br><span class="line">sudo service miredo start</span><br></pre></td></tr></table></figure>
+<h2 id="2、进行安装"><a href="#2、进行安装" class="headerlink" title="2、进行安装"></a>2、进行安装</h2><ol>
+<li>安装xx-net，这个大家应该都比较熟，首先解压安装包<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 解压</span><br><span class="line">sudo unzip XX-Net-3.8.7.zip</span><br><span class="line"><span class="meta">#</span> 移动xx-net到/opt/目录，这个目录是我比较喜欢的软件安装目录，一般deb包安装的软件也都是安装在这个目录下面</span><br><span class="line">sudo mv XX-Net-3.8.7 /opt/</span><br><span class="line"><span class="meta">#</span> 开始运行</span><br><span class="line">sudo /opt/XX-Net-3.8.7/start</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="3、进入localhost-8085管理界面"><a href="#3、进入localhost-8085管理界面" class="headerlink" title="3、进入localhost:8085管理界面"></a>3、进入localhost:8085管理界面</h2><p>经过以上的步骤，我们已经开启了xx-net 以及 miredo服务,在浏览器中访问xx-net 的管理界面，我们现在应该能够看到一些内容<br><img src="/2018/01/04/2018年使用ipv6-XX-net翻墙/xx_net.png" alt="图片1">:</p>
+<h2 id="4、注意事项"><a href="#4、注意事项" class="headerlink" title="4、注意事项"></a>4、注意事项</h2><ol>
+<li>教育网没有办法使用miredo</li>
+<li>重启电脑后联网后，需要使用启动miredo<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo miredo</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1345,7 +1502,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1356,7 +1513,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1367,7 +1524,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -1420,7 +1577,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
