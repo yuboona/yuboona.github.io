@@ -252,6 +252,160 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/18/解决CMAKE编译第三方开源软件需要下载的问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/18/解决CMAKE编译第三方开源软件需要下载的问题/" itemprop="url">解决CMAKE编译第三方开源软件需要下载的问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-18T17:40:30+08:00">
+                2018-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编译开源软件/" itemprop="url" rel="index">
+                    <span itemprop="name">编译开源软件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="解决CMAKE编译第三方开源软件需要下载的问题"><a href="#解决CMAKE编译第三方开源软件需要下载的问题" class="headerlink" title="解决CMAKE编译第三方开源软件需要下载的问题"></a>解决CMAKE编译第三方开源软件需要下载的问题</h1><p>经常会出现这种问题：我们从github上面下载了一些开源软件，但是这个开源软件<strong>本身其实是会下载很多其他开源软件</strong>，编译后作为软件的一部分。<br>看起来好像没什么问题，但是有时候这个下载很耗时间，让整个安装变得很慢，它本身的这个下载过程下载东西真的很不稳定。所以就导致了有可能的安装失败。重新多次安装又要多次下载，这个过程真的很浪费时间和网络资源硬盘资源。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过对于我最近使用的一个软件的cmake过程的研究，发现这个软件安装时进行第三方的包的下载的时候，是通过CMAKE自带的下载和编译功能进行的。所以为了：</p>
+<ul>
+<li>能够让下载第三方源码的过程被消除</li>
+<li>同时为了保证不发生因为下载慢，导致的第三方的开源软件的编译的<strong>进程竞争</strong>，进而导致安装时的开源软件之间的互相依赖或者make文件不存在问题。</li>
+</ul>
+<h3 id="–采用网上对于CMAKE过程的修改方法"><a href="#–采用网上对于CMAKE过程的修改方法" class="headerlink" title="–采用网上对于CMAKE过程的修改方法"></a>–采用网上对于CMAKE过程的修改方法</h3><ol>
+<li><p>将.cmake 文件中的以下代码<br> #–Download step————–<br> DOWNLOAD_DIR      ${SB_DOWNLOAD_DIR}<br> URL  <a href="https://github.com/gflags/gflags/archive/v2.1.2.zip" target="_blank" rel="noopener">https://github.com/gflags/gflags/archive/v2.1.2.zip</a><br> URL_MD5           5cb0a1b38740ed596edb7f86cd5b3bd8<br> 部分更改为<br> #–Download step————–<br> DOWNLOAD_COMMAND “”</p>
+</li>
+<li><p>同时，将src（这个文件是原本解压下载的第三方源码source的地方，具体名称要看CMakeLists.txt中SOURCE_DIR的设置）中的各个第三方源码都解压好，放到src对应的文件夹中。</p>
+</li>
+</ol>
+<p>结果：<strong>这样整个程序编译第三方开源软件的编译过程就可以直接调用src目录中我们早就自己下载好的源码进行安装了</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/14/using-Electron-to-create-app-with-Js-html-css/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -658,34 +812,34 @@
       
         
           
-            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来</p>
 <h2 id="携程"><a href="#携程" class="headerlink" title="携程"></a>携程</h2><h3 id="分析数据"><a href="#分析数据" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;首先我们去携程的<a href="http://you.ctrip.com/sight/gulangyu120058.html" target="_blank" rel="noopener">鼓浪屿景点速览</a>看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结构应该都是差不多的，所以我们选择<a href="http://you.ctrip.com/sight/gulangyu120058/57405.html" target="_blank" rel="noopener">第一个景点</a>进去看看具体的页面应该怎么爬取。</p>
 <p><img src="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg" alt="鼓浪屿评论分析" title="结果"></p>
-<p>我们需要的是红圈的部分，很容易可以知道这个评论页面是动态加载的，所以不能直接用bs4或者正则直接提取元素，我们需要分析一下页面动态传输的接口。打开chrome审查元素,切换到network查看一下传输的内容，首先清空内容避免干扰，然后点击下一页，我们可以得到</p>
+<p>我们需要的是红圈的部分，很容易可以知道这个评论页面是动态加载的，所以不能直接用bs4或者正则直接提取元素，我们需要分析一下页面动态传输的接口。打开chrome审查元素,切换到network查看一下传输的内容，首先清空内容避免干扰，然后点击下一页，我们可以得到</p>
 <p><img src="http://111.230.251.140:8000/images/gulangyu_check.jpg" alt="鼓浪屿审查元素" title="结果"></p>
-<p>通过查看传回的数据我们可以得到这就是我们所要的接口，使用的是post进行传输，传输的Form Data 有很多字段，大致可以猜测出来</p>
+<p>通过查看传回的数据我们可以得到这就是我们所要的接口，使用的是post进行传输，传输的Form Data 有很多字段，大致可以猜测出来</p>
 <blockquote>
 <p>poiID 是景点的poiID <br> pagenow 是当前的页数 <br> star 是评分1-5，0代表全部 <br> resourceId 是一个每个资源对应的值</p>
 </blockquote>
-<p>爬取的时候只需要改变这些值就可以根据自己的需求爬取内容了，但是需要注意的事携程的pagenow最多只能获取100页，而且poiID和resourceId的值是没有规律的，需要我们逐个景点查看…我自己依次找了鼓浪屿所有景点的值，并存在文本中，文末有github的共享。</p>
+<p>爬取的时候只需要改变这些值就可以根据自己的需求爬取内容了，但是需要注意的事携程的pagenow最多只能获取100页，而且poiID和resourceId的值是没有规律的，需要我们逐个景点查看…我自己依次找了鼓浪屿所有景点的值，并存在文本中，文末有github的共享。</p>
 <h3 id="建库"><a href="#建库" class="headerlink" title="建库"></a>建库</h3><p>&emsp;&emsp;我们要做的第一件事就是想好数据库的结构,我选择的还是使用mysql，具体的结构如下：</p>
 <p><img src="http://111.230.251.140:8000/images/ctrip_mysql.jpg" alt="携程建库" title="结果"></p>
-<h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><p>&emsp;&emsp;这个我就不具体分析了，也不难，就是有几个坑要注意一下。</p>
+<h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><p>&emsp;&emsp;这个我就不具体分析了，也不难，就是有几个坑要注意一下。</p>
 <blockquote>
-<p>第一，不是所有评论都有景色，性价比之类的评分，所以这里要加一个判断。<br> 第二，原来是有出行时间这一项的，现在好像没有了额。<br> 第三，评论文本可能会出现单引号，插入数据库会出现错误，要转义或者替代一下。<br> 第四，抓取速度不要太快，携程反扒还是比较厉害的。</p>
+<p>第一，不是所有评论都有景色，性价比之类的评分，所以这里要加一个判断。<br> 第二，原来是有出行时间这一项的，现在好像没有了额。<br> 第三，评论文本可能会出现单引号，插入数据库会出现错误，要转义或者替代一下。<br> 第四，抓取速度不要太快，携程反扒还是比较厉害的。</p>
 </blockquote>
-<h2 id="蚂蜂窝"><a href="#蚂蜂窝" class="headerlink" title="蚂蜂窝"></a>蚂蜂窝</h2><h3 id="分析数据-1"><a href="#分析数据-1" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;同样，蚂蜂窝的数据也是动态加载的，用相同的方法查看分析数据接口。</p>
+<h2 id="蚂蜂窝"><a href="#蚂蜂窝" class="headerlink" title="蚂蜂窝"></a>蚂蜂窝</h2><h3 id="分析数据-1"><a href="#分析数据-1" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;同样，蚂蜂窝的数据也是动态加载的，用相同的方法查看分析数据接口。</p>
 <p><img src="http://111.230.251.140:8000/images/mafengwo_detail.jpg" alt="蚂蜂窝" title="结果"></p>
-<p>可以看到蚂蜂窝的数据获取方式是get，我们可以找出请求的url的规律。经过比较不同景点和不同页面的数据，我们发现参数的改变主要在两个地方，一个是poiid我用href代替，一个是页数我用num代替。获取景点的评论数据只要改变这两个值就可以了</p>
+<p>可以看到蚂蜂窝的数据获取方式是get，我们可以找出请求的url的规律。经过比较不同景点和不同页面的数据，我们发现参数的改变主要在两个地方，一个是poiid我用href代替，一个是页数我用num代替。获取景点的评论数据只要改变这两个值就可以了</p>
 <blockquote>
 <p>url=’<a href="http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D" target="_blank" rel="noopener">http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D</a>‘</p>
 </blockquote>
 <h3 id="获取每个景点的poi"><a href="#获取每个景点的poi" class="headerlink" title="获取每个景点的poi"></a>获取每个景点的poi</h3><p>这个不是post请求我们就不必一个个景点去获取参数了，我们可以访问<a href="http://www.mafengwo.cn/jd/12522/gonglve.html" target="_blank" rel="noopener">这个站点</a>来发现所有的用户，然而这个站点的数据也是动态加载的</p>
 <p><img src="http://111.230.251.140:8000/images/mafengwo_all_scenery.jpg" alt="蚂蜂窝" title="结果"></p>
 <p><img src="http://111.230.251.140:8000/images/mafengwo_router_header.jpg" alt="蚂蜂窝" title="结果"></p>
-<p><img src="http://111.230.251.140:8000/images/mafengwo_router_preview.jpg" alt="蚂蜂窝" title="结果"></p>
-<p>根据上面的图片我们可以清晰的看到我们只需要传入页码数就可以得到所有的景点的poiid,然后根据这些poiid我们就可以得到所有的评论数据，这一部分我们用一个函数来处理</p>
+<p><img src="http://111.230.251.140:8000/images/mafengwo_router_preview.jpg" alt="蚂蜂窝" title="结果"></p>
+<p>根据上面的图片我们可以清晰的看到我们只需要传入页码数就可以得到所有的景点的poiid,然后根据这些poiid我们就可以得到所有的评论数据，这一部分我们用一个函数来处理</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_param</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 获取所有景点的参数</span></span><br><span class="line">    total = []</span><br><span class="line">    router_url = <span class="string">'http://www.mafengwo.cn/ajax/router.php'</span></span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">6</span>):</span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">'sAct'</span>: <span class="string">'KMdd_StructWebAjax|GetPoisByTag'</span>,</span><br><span class="line">            <span class="string">'iMddid'</span>: <span class="number">12522</span>,</span><br><span class="line">            <span class="string">'iTagId'</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="string">'iPage'</span>: num</span><br><span class="line">        &#125;</span><br><span class="line">        pos = requests.post(url=router_url, data=params, headers=headers).json()</span><br><span class="line">        soup_pos = BeautifulSoup(pos[<span class="string">'data'</span>][<span class="string">'list'</span>], <span class="string">'lxml'</span>)</span><br><span class="line"></span><br><span class="line">        result = [&#123;<span class="string">'scenery'</span>: p[<span class="string">'title'</span>], <span class="string">'href'</span>: re.findall(re.compile(<span class="string">r'/poi/(\d+).html'</span>), p[<span class="string">'href'</span>])[<span class="number">0</span>]&#125; <span class="keyword">for</span> p <span class="keyword">in</span></span><br><span class="line">                  soup_pos.find_all(<span class="string">'a'</span>)]</span><br><span class="line">        total.extend(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> total</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;其余部分相似，不再过多说明。</p>
 
@@ -829,7 +983,7 @@
       
         
           
-            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;由于硬件等各种原因需要把大概170多万2t左右的微博图片数据存到Mysql中.之前存微博数据一直用的非关系型数据库mongodb，由于对Mysql的各种不熟悉，踩了无数坑，来来回回改了3天才完成。</p>
 <h2 id="挖坑填坑之旅"><a href="#挖坑填坑之旅" class="headerlink" title="挖坑填坑之旅"></a>挖坑填坑之旅</h2><h3 id="建表"><a href="#建表" class="headerlink" title="建表"></a><strong>建表</strong></h3><p>存数据的时候首先需要设计数据库,我准备设计了3个表</p>
 <p>微博表：[id, userid, blog_text, lat, lng, created_time, reserve]&emsp;&emsp; <strong>pkey: id</strong></p>
@@ -983,7 +1137,7 @@
       
         
           
-            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><blockquote>
 <p>参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内容的相似来完成的。(通俗点说就是去噪去噪去噪，然后只留下相对有规律的日期，内容)</p>
 </blockquote>
@@ -1184,7 +1338,7 @@
       
         
           
-            <p>本人长期出售抓取超大量微博数据的代码，并提供微博数据打包出售，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="利用新浪API实现数据的抓取"><a href="#利用新浪API实现数据的抓取" class="headerlink" title="利用新浪API实现数据的抓取"></a><strong>利用新浪API实现数据的抓取</strong></h1><h3 id="1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。"><a href="#1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。" class="headerlink" title="1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。　"></a><strong><em>1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。</em></strong>　</h3><p><img src="http://111.230.251.140:8000/images/result.png" alt="注册新浪微博" title="结果"><br><br></p>
 <p>我主要抓取了大概4天的数据，图上可以看的出来大概有360万条数据，由于是在自己的电脑上爬取做数据的，有时候晚上断网了就间断了，所以大概一天可以爬取有100万左右的<strong>最新微博数据</strong>（因为我调用的是最新的微博API　<a href="http://open.weibo.com/wiki/2/statuses/public_timeline" target="_blank" rel="noopener">public_timeline</a>)</p>
 <p>API文档当中定义了很多返回的类型（以json数据格式返回，我选取了一些我认为重要的信息抓取下来<em>如图所示</em>:　大概有<strong>id号</strong>，<strong>所在位置</strong>，<strong>粉丝数</strong>，发的<strong>微博内容</strong>，发微博的<strong>时间</strong>等等。　当然这些数据都可以根据自己的需要进行定制。)</p>
@@ -1658,7 +1812,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1669,7 +1823,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1680,7 +1834,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
