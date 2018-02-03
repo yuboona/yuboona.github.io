@@ -252,6 +252,157 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/03/python爬取图片/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/03/python爬取图片/" itemprop="url">python爬取图片</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-03T10:05:39+08:00">
+                2018-02-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近在做机器学习下的人脸识别的学习，机器学习这个东西有点暴力，很大程度上靠训练的数据量来决定效果。为了找数据，通过一个<a href="http://blog.csdn.net/chenriwei2/article/details/50631212" target="_blank" rel="noopener">博客</a>的指导，浏览了几个很知名的数据集。</p>
+<p>几个大型数据集是通过发邮件申请进行下载，几个小型数据集直接在网页的链接下载，还有一个<a href="http://www.cs.columbia.edu/CAVE/databases/pubfig/" target="_blank" rel="noopener">Pubfig</a>数据集则是提供了大量图片的链接来让我们自己写程序来下载。</p>
+<p>权衡了数据量的需求，最后选择Pubfig的数据集，于是就自己写了一个python图片采集程序，里面用了urllib和requests两种方法.</p>
+<h2 id="分析Pubfig提供的下载文件的特点"><a href="#分析Pubfig提供的下载文件的特点" class="headerlink" title="分析Pubfig提供的下载文件的特点"></a>分析<a href="http://www.cs.columbia.edu/CAVE/databases/pubfig/" target="_blank" rel="noopener">Pubfig</a>提供的下载文件的特点</h2><p><img src="/2018/02/03/python爬取图片/people.png" alt="people"><br>这个数据文件提供了在数据集中出现的所有人物<br><img src="/2018/02/03/python爬取图片/urls.png" alt="urls"><br>这个数据文件提供了每个人的urls</p>
+<p>可以看出来这个数据集的处理其实非常简单了，可以通过readlines的方式存进列表用空格分开一下数据就可以把urls提取出来了。</p>
+<h2 id="处理一下urls文件"><a href="#处理一下urls文件" class="headerlink" title="处理一下urls文件"></a>处理一下urls文件</h2><p>urls在文件的中后部，写个文件把它单纯地提取出来，方便使用。<br>我单独把Miley_Cyrus的部分提取出来放了一个txt文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">pic_url = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./Miley_Cyrus.txt'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        pic_url.append(i.strip(<span class="string">'\r\n'</span>))</span><br><span class="line"></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> pic_url:</span><br><span class="line">    _, _, _, url, _, _ = s.split()</span><br><span class="line">    urls.append(url)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写入到文件里面</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'url.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> urls:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="爬取urls图片"><a href="#爬取urls图片" class="headerlink" title="爬取urls图片"></a>爬取urls图片</h2><h3 id="1-Urllibs方法"><a href="#1-Urllibs方法" class="headerlink" title="1. Urllibs方法"></a>1. Urllibs方法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib.request <span class="keyword">as</span> request</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在同级目录新建文件夹存图片</span></span><br><span class="line">os.mkdir(<span class="string">'./img'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为请求增加一下头</span></span><br><span class="line">user_agent = <span class="string">'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'</span></span><br><span class="line">headers = (<span class="string">'User-Agent'</span>, user_agent)</span><br><span class="line">opener = request.build_opener()</span><br><span class="line">opener.addheaders = [headers]</span><br><span class="line">request.install_opener(opener)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设定一下无响应时间，防止有的坏图片长时间没办法下载下来</span></span><br><span class="line">timeout = <span class="number">20</span></span><br><span class="line">socket.setdefaulttimeout(timeout)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从文件里面读urls</span></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./url.data'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        <span class="keyword">if</span> i != <span class="string">''</span>:</span><br><span class="line">            urls.append(i)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过urllibs的requests获取所有的图片</span></span><br><span class="line">count = <span class="number">1</span></span><br><span class="line">bad_url = []</span><br><span class="line"><span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">    url.rstrip(<span class="string">'\n'</span>)</span><br><span class="line">    print(url)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pic = request.urlretrieve(url, <span class="string">'./img3/%d.jpg'</span> % count)</span><br><span class="line">        print(<span class="string">'pic %d'</span> % count)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        print(Exception, <span class="string">':'</span>, e)</span><br><span class="line">        bad_url.append(url)</span><br><span class="line">    print(<span class="string">'\n'</span>)</span><br><span class="line">print(<span class="string">'got all photos that can be got'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把没有抓取到的urls保存起来</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'bad_url3.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> bad_url:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br><span class="line">    print(<span class="string">'saved bad urls'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="2-Requests方法"><a href="#2-Requests方法" class="headerlink" title="2. Requests方法"></a>2. Requests方法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在同级目录新建文件夹存图片</span></span><br><span class="line">os.mkdir(<span class="string">'./img'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设定一下无响应时间，防止有的坏图片长时间没办法下载下来</span></span><br><span class="line">timeout = <span class="number">20</span></span><br><span class="line">socket.setdefaulttimeout(timeout)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从文件里面读urls</span></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./url.data'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        <span class="keyword">if</span> i != <span class="string">''</span>:</span><br><span class="line">            urls.append(i)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为请求增加一下头，获取图片</span></span><br><span class="line">user_agent = <span class="string">'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'</span></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: user_agent</span><br><span class="line">&#125;</span><br><span class="line">bad_url = []</span><br><span class="line">count = <span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">    url.rstrip(<span class="string">'\n'</span>)</span><br><span class="line">    print(url)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pic = requests.get(url, headers=headers)</span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">'./img2/%d.jpg'</span> % count, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(pic.content)</span><br><span class="line">            f.flush()</span><br><span class="line">        print(<span class="string">'pic %d'</span> % count)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        print(Exception, <span class="string">':'</span>, e)</span><br><span class="line">        bad_url.append(url)</span><br><span class="line">    print(<span class="string">'\n'</span>)</span><br><span class="line">print(<span class="string">'got all photos that can be got'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存坏链接</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'bad_url.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> bad_url:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br><span class="line">    print(<span class="string">'saved bad urls'</span>)</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/18/解决CMAKE编译第三方开源软件需要下载的问题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -345,7 +496,8 @@
       
         
           
-            <h1 id="解决CMAKE编译第三方开源软件需要下载的问题"><a href="#解决CMAKE编译第三方开源软件需要下载的问题" class="headerlink" title="解决CMAKE编译第三方开源软件需要下载的问题"></a>解决CMAKE编译第三方开源软件需要下载的问题</h1><p>经常会出现这种问题：我们从github上面下载了一些开源软件，但是这个开源软件<strong>本身其实是会下载很多其他开源软件</strong>，编译后作为软件的一部分。<br>看起来好像没什么问题，但是有时候这个下载很耗时间，让整个安装变得很慢，它本身的这个下载过程下载东西真的很不稳定。所以就导致了有可能的安装失败。重新多次安装又要多次下载，这个过程真的很浪费时间和网络资源硬盘资源。</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
+<h1 id="解决CMAKE编译第三方开源软件需要下载的问题"><a href="#解决CMAKE编译第三方开源软件需要下载的问题" class="headerlink" title="解决CMAKE编译第三方开源软件需要下载的问题"></a>解决CMAKE编译第三方开源软件需要下载的问题</h1><p>经常会出现这种问题：我们从github上面下载了一些开源软件，但是这个开源软件<strong>本身其实是会下载很多其他开源软件</strong>，编译后作为软件的一部分。<br>看起来好像没什么问题，但是有时候这个下载很耗时间，让整个安装变得很慢，它本身的这个下载过程下载东西真的很不稳定。所以就导致了有可能的安装失败。重新多次安装又要多次下载，这个过程真的很浪费时间和网络资源硬盘资源。</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过对于我最近使用的一个软件的cmake过程的研究，发现这个软件安装时进行第三方的包的下载的时候，是通过CMAKE自带的下载和编译功能进行的。所以为了：</p>
 <ul>
 <li>能够让下载第三方源码的过程被消除</li>
@@ -812,7 +964,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来</p>
 <h2 id="携程"><a href="#携程" class="headerlink" title="携程"></a>携程</h2><h3 id="分析数据"><a href="#分析数据" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;首先我们去携程的<a href="http://you.ctrip.com/sight/gulangyu120058.html" target="_blank" rel="noopener">鼓浪屿景点速览</a>看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结构应该都是差不多的，所以我们选择<a href="http://you.ctrip.com/sight/gulangyu120058/57405.html" target="_blank" rel="noopener">第一个景点</a>进去看看具体的页面应该怎么爬取。</p>
 <p><img src="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg" alt="鼓浪屿评论分析" title="结果"></p>
@@ -983,7 +1135,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;由于硬件等各种原因需要把大概170多万2t左右的微博图片数据存到Mysql中.之前存微博数据一直用的非关系型数据库mongodb，由于对Mysql的各种不熟悉，踩了无数坑，来来回回改了3天才完成。</p>
 <h2 id="挖坑填坑之旅"><a href="#挖坑填坑之旅" class="headerlink" title="挖坑填坑之旅"></a>挖坑填坑之旅</h2><h3 id="建表"><a href="#建表" class="headerlink" title="建表"></a><strong>建表</strong></h3><p>存数据的时候首先需要设计数据库,我准备设计了3个表</p>
 <p>微博表：[id, userid, blog_text, lat, lng, created_time, reserve]&emsp;&emsp; <strong>pkey: id</strong></p>
@@ -1137,7 +1289,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><blockquote>
 <p>参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内容的相似来完成的。(通俗点说就是去噪去噪去噪，然后只留下相对有规律的日期，内容)</p>
 </blockquote>
@@ -1338,7 +1490,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据，并提供特定微博数据打包，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
 <h1 id="利用新浪API实现数据的抓取"><a href="#利用新浪API实现数据的抓取" class="headerlink" title="利用新浪API实现数据的抓取"></a><strong>利用新浪API实现数据的抓取</strong></h1><h3 id="1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。"><a href="#1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。" class="headerlink" title="1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。　"></a><strong><em>1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。</em></strong>　</h3><p><img src="http://111.230.251.140:8000/images/result.png" alt="注册新浪微博" title="结果"><br><br></p>
 <p>我主要抓取了大概4天的数据，图上可以看的出来大概有360万条数据，由于是在自己的电脑上爬取做数据的，有时候晚上断网了就间断了，所以大概一天可以爬取有100万左右的<strong>最新微博数据</strong>（因为我调用的是最新的微博API　<a href="http://open.weibo.com/wiki/2/statuses/public_timeline" target="_blank" rel="noopener">public_timeline</a>)</p>
 <p>API文档当中定义了很多返回的类型（以json数据格式返回，我选取了一些我认为重要的信息抓取下来<em>如图所示</em>:　大概有<strong>id号</strong>，<strong>所在位置</strong>，<strong>粉丝数</strong>，发的<strong>微博内容</strong>，发微博的<strong>时间</strong>等等。　当然这些数据都可以根据自己的需要进行定制。)</p>
@@ -1812,7 +1964,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1834,7 +1986,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
