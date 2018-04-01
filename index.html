@@ -252,6 +252,234 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/利用新浪API实现数据抓取/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/利用新浪API实现数据抓取/" itemprop="url">利用新浪API实现数据抓取</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T18:37:42+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="利用新浪API实现数据的抓取-2018-3-3-更新"><a href="#利用新浪API实现数据的抓取-2018-3-3-更新" class="headerlink" title="利用新浪API实现数据的抓取(2018.3.3 更新)"></a><strong>利用新浪API实现数据的抓取(2018.3.3 更新)</strong></h1><font color="#FF0000" size="4" face="黑体"><br>2017.3.3 说明<br><br>注意：这两天有人给我反映，说爬到的数据都是重复的，而且不能再一直爬了，可能是因为新浪微博api改了，对api研究并不深入，当初只是做的玩一下，并没有很多时间取研究这个了，希望可以抛砖引玉，小伙伴们解决了这个问题也可以跟我说，大家一起进步<br><br></font>
+
+<hr>
+<h3 id="1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。"><a href="#1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。" class="headerlink" title="1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。　"></a><strong><em>1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。</em></strong>　</h3><p><img src="http://111.230.251.140:8000/images/result.png" alt="注册新浪微博" title="结果"><br><br></p>
+<p>我主要抓取了大概4天的数据，图上可以看的出来大概有360万条数据，由于是在自己的电脑上爬取做数据的，有时候晚上断网了就间断了，所以大概一天可以爬取有100万左右的<strong>最新微博数据</strong>（因为我调用的是最新的微博API　<a href="http://open.weibo.com/wiki/2/statuses/public_timeline" target="_blank" rel="noopener">public_timeline</a>)</p>
+<p>API文档当中定义了很多返回的类型（以json数据格式返回，我选取了一些我认为重要的信息抓取下来<em>如图所示</em>:　大概有<strong>id号</strong>，<strong>所在位置</strong>，<strong>粉丝数</strong>，发的<strong>微博内容</strong>，发微博的<strong>时间</strong>等等。　当然这些数据都可以根据自己的需要进行定制。)</p>
+<h4 id="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦"><a href="#大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦" class="headerlink" title="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦"></a>大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦</h4><h3 id="2-前期准备"><a href="#2-前期准备" class="headerlink" title="2.　前期准备"></a><strong><em>2.　前期准备</em></strong></h3><p><strong>我们需要的东西：</strong></p>
+<ul>
+<li>数据库:　mongodb（可以使用客户端<a href="https://mongobooster.com/downloads" target="_blank" rel="noopener">MongoBooster</a>)</li>
+<li>开发环境：　Python2.7(我用的IDE是<a href="https://www.jetbrains.com/pycharm/" target="_blank" rel="noopener">Pycharm</a>)</li>
+<li>一个新浪开发者账号：　用自己的新浪微博账号注册就行（后面会讲）</li>
+<li>需要的库：　<a href="http://github.liaoxuefeng.com/sinaweibopy/" target="_blank" rel="noopener">sinaweibopy</a>和pymongo(这些都可以在Pycharm中下载)</li>
+</ul>
+<h4 id="2-1-mongodb的安装"><a href="#2-1-mongodb的安装" class="headerlink" title="2.1　mongodb的安装"></a>2.1　mongodb的安装</h4><p>MongoDB是一个高性能，开源，无模式的文档型数据库，是当前NoSql数据库中比较热门的一种。它在许多场景下可用于替代传统的关系型数据库或键/值存储方式。Mongo使用C++开发。Mongo的官方网站地址是：<a href="http://www.mongodb.org/" target="_blank" rel="noopener">http://www.mongodb.org/</a>，读者可以在此获得更详细的信息。</p>
+<blockquote>
+<p>小插曲：什么是NoSql?</p>
+<p>　　NoSql，全称是 Not Only Sql,指的是非关系型的数据库。下一代数据库主要解决几个要点：非关系型的、分布式的、开源的、水平可扩展的。原始的目的是为了大规模web应用，这场运动开始于2009年初，通常特性应用如：模式自由、支持简易复制、简单的API、最终的一致性（非ACID）、大容量数据等。NoSQL被我们用得最多的当数key-value存储，当然还有其他的文档型的、列存储、图型数据库、xml数据库等。</p>
+</blockquote>
+<h4 id="网上有很多安装mongodb教程我就不写了"><a href="#网上有很多安装mongodb教程我就不写了" class="headerlink" title="网上有很多安装mongodb教程我就不写了"></a>网上有很多安装mongodb教程我就不写了</h4><p><a href="http://www.runoob.com/mongodb/mongodb-window-install.html" target="_blank" rel="noopener">Windows下mongodb的安装</a></p>
+<p><a href="http://www.runoob.com/mongodb/mongodb-linux-install.html" target="_blank" rel="noopener">Linux下mongodb的安装</a></p>
+<h4 id="2-2-新浪开发者账号的注册方法"><a href="#2-2-新浪开发者账号的注册方法" class="headerlink" title="2.2　新浪开发者账号的注册方法"></a>2.2　新浪开发者账号的注册方法</h4><ul>
+<li><strong>注册新浪微博账号（163邮箱、手机号）</strong></li>
+</ul>
+<p><img src="http://111.230.251.140:8000/images/sina1.png" alt="注册新浪微博" title="注册新浪微博"></p>
+<p>　　<strong> 创建完毕需要填写手机号验证 </strong><br><br></p>
+<ul>
+<li><strong>进入新浪开放者平台：<a href="http://open.weibo.com/" target="_blank" rel="noopener">http://open.weibo.com/</a></strong></li>
+</ul>
+<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
+<p><img src="http://111.230.251.140:8000/images/sina3.png" alt="sina"><br><br></p>
+<p><img src="http://111.230.251.140:8000/images/sina4.png" alt="sina"></p>
+<ul>
+<li><strong>点击继续创建</strong></li>
+</ul>
+<p>初次创建应用需要填写如下信息：</p>
+<p><img src="http://111.230.251.140:8000/images/sina5.png" alt="sina"></p>
+<p>此页面信息不需要填写真实信息，如地区，电话，可随意填写。网站填<a href="https://www.baidu.com/" target="_blank" rel="noopener">https://www.baidu.com/</a>即可。(邮箱要真实)</p>
+<p>继续创建应用。应用名称自定义，平台如下勾选 ios 、andrioid</p>
+<p><img src="http://111.230.251.140:8000/images/sina6.png" alt="sina"></p>
+<p>创建完毕直接返回继续创建，一个账号可以创建10个应用，每个应用对应一个access-token(事实上我只用了一个就可以满足需求)</p>
+<ul>
+<li><strong>前往<a href="http://open.weibo.com/tools/console" target="_blank" rel="noopener">API测试平台</a></strong></li>
+</ul>
+<p><img src="http://111.230.251.140:8000/images/sina7.png" alt="sina"><br><br></p>
+<p><img src="http://111.230.251.140:8000/images/sina8.png" alt="sina"><br><br></p>
+<p>依次选取创建的应用。点<img src="http://111.230.251.140:8000/images/sina9.png" alt="sina">将下方的token用txt保存即可。</p>
+<ul>
+<li><strong>获取key</strong></li>
+</ul>
+<p>回到</p>
+<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
+<p>点击<strong>我的应用</strong></p>
+<p>然后选择自己刚刚创建的应用</p>
+<p><img src="http://111.230.251.140:8000/images/sina10.png" alt="sina"></p>
+<p>进入之后点击<strong>应用信息</strong></p>
+<p><img src="http://111.230.251.140:8000/images/sina11.png" alt="sina"></p>
+<p>保存下　<strong>APP Key</strong> 和　<strong>APP Secret</strong></p>
+<p>点击<strong>高级信息</strong></p>
+<p>设置回调网址</p>
+<p><img src="http://111.230.251.140:8000/images/sina12.png" alt="sina"></p>
+<p>可以设置成默认的<br><a href="http://api.weibo.com/oauth2/default.html" target="_blank" rel="noopener">http://api.weibo.com/oauth2/default.html</a></p>
+<p>至此你的开发者账号就已经完成了</p>
+<h4 id="2-3-依赖库的安装方法"><a href="#2-3-依赖库的安装方法" class="headerlink" title="2.3　依赖库的安装方法"></a>2.3　依赖库的安装方法</h4><p><a href="http://github.liaoxuefeng.com/sinaweibopy/" target="_blank" rel="noopener">sinaweibopy</a>和pymongo的安装</p>
+<p>可以直接用pip安装<br><strong>pip install requests</strong>　和　<strong>pip install pymongo</strong></p>
+<p>也可以在Pycharm里面直接安装</p>
+<p>选择File -&gt; Settings -&gt; Project -&gt; Project Interpreter</p>
+<p>可以看到自己安装的Python库，点击右边的绿色<strong>　＋　</strong> 号</p>
+<p>安装即可</p>
+<h3 id="3-分析问题"><a href="#3-分析问题" class="headerlink" title="3.　分析问题　"></a><strong><em>3.　分析问题</em></strong>　</h3><h4 id="3-1-OAuth-认证"><a href="#3-1-OAuth-认证" class="headerlink" title="3.1 OAuth 认证"></a><strong>3.1 OAuth 认证</strong></h4><p><strong> 授权机制说明（很重要）</strong></p>
+<p>网上很多讲利用新浪微博API发送微博什么的都是使用的<strong>请求用户授权Token</strong>这种方式，但是这种方式显然不适用于我们爬取数据，因为每次都要请求，每次都要重新获取code。具体可参考<a href="http://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6%E8%AF%B4%E6%98%8E" target="_blank" rel="noopener">新浪微博API的授权机制</a></p>
+<p>廖雪峰老师(sinaweibopy 的贡献者）也对这个授权机制有一个说明</p>
+<blockquote>
+<p>通过新浪微博的API接入网站，由于用户无需在您的网站上注册，就可以直接?使用他／她在新浪微博的帐号和口令登录您的网站，这就需要确保您的网站在无需知道，也不能知道用户口令的情况下确认用户已经登录成功。由于用户的口令存储在新浪微博，因此，认证用户的过程只能由新浪微博完成，但新浪微博如何与您的网站通信并告知您用户是否登录成功呢？这个过程称之为第三方登录，OAuth是一个标准的第三方登录协议，借助OAuth，您的网站就可以安全地接入来自新浪微博登录成功的用户。</p>
+<p>OAuth目前主要有1.0和2.0两个版本，2.0版对1.0版做了大量简化，API也更简单。新浪微博最新的API也是采用的OAuth 2.0，整个登录流程如下：</p>
+<ol>
+<li>用户在您的网站上点击“使用新浪微博登录”，您的网站将用户重定向到新浪微博的OAuth认证页，重定向链接中包含client_id参数作为您的网站ID，redirect_uri参数告诉新浪微博当用户登录成功后，将浏览器重定向到您的网站；</li>
+<li>用户在新浪微博的认证页输入帐号和口令；</li>
+<li>新浪微博认证成功后，将浏览器重定向到您的网站，并附上code参数；</li>
+<li>您的网站通过code参数向新浪微博请求用户的access token；</li>
+<li>您的网站拿到用户的access token后，用户登录完成。<br>OAuth的access token是提供认证服务的网站（例如新浪微博）生成的令牌，代表一个用户认证信息。在随后的API调用中，传入该access token就代表这个登录用户，这样，通过OAuth协议，您的网站将验证用户的步骤交给新浪微博完成，并由新浪微博告知您用户是否登录成功。</li>
+</ol>
+<p>OAuth的安全性是通过步骤4完成的，通过code参数获取access token的过程是您的网站后台到新浪微博网站完成的，用户无法看到获取access token的HTTP请求。如果用户传入伪造的code，则新浪微博会返回一个错误。</p>
+</blockquote>
+<p>具体内容请看<a href="http://www.liaoxuefeng.com/article/00137389308005720bf24cb6cf14d9e897e7026dbc6a842000" target="_blank" rel="noopener">廖雪峰老师的文档</a></p>
+<p>大致上来说按照一般的请求用户授权Token调用会出现这种情况：</p>
+<p><img src="http://111.230.251.140:8000/images/sina14.png" alt="登录微博" title="登录微博"><br><br></p>
+<p>获取code<br><img src="http://111.230.251.140:8000/images/sina13.png" alt="获取code"></p>
+<p>登陆后会调转到一个连接<a href="https://api.weibo.com/oauth2/default.html?code=××××××××" target="_blank" rel="noopener">https://api.weibo.com/oauth2/default.html?code=××××××××</a>　</p>
+<p>我们所需要的就是code=××××××××××　的值</p>
+<h4 id="也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站"><a href="#也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站" class="headerlink" title="也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站　"></a><strong>也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站</strong>　</h4><p>怎么解决问题呢？首先我们想到的自然是在Python程序里面模拟登录新浪微博，然后自然可以获取到code的值，但是，模拟新浪微博登录相对来说比较复杂，而且既然都模拟登录成功了，为啥还要调用API呢…直接自定义进行抓取不是更加方便。</p>
+<p><strong>如果看了上面的那个授权机制，就应该想到。这个时候就需要我们之前申请的access-token了</strong></p>
+<p>access-token 根据我的理解就是把你的微博授权给了第三方让他帮你做一些事情，类似于在你的手机端通过新浪微博来登录然后进行操作(利用上面授权机制里面讲的一句话来说就是)<em>移动端应用可直接使用官方移动SDK，通过呼起微博客户端（未安装微博客户端的会呼起H5授权页）方式授权</em></p>
+<p>这个界面你应该很熟悉</p>
+<p><img src="http://111.230.251.140:8000/images/sina15.png" alt="新浪授权"></p>
+<p>新浪也给出了说明<a href="http://open.weibo.com/wiki/Oauth2/access_token" target="_blank" rel="noopener">Oauth2/access token</a></p>
+<h3 id="４-代码实现"><a href="#４-代码实现" class="headerlink" title="４.　代码实现　"></a><strong><em>４.　代码实现</em></strong>　</h3><p>有了token之后，实现抓取数据就十分简单了<br>能抓取数据的多少就取决于你的token权限了</p>
+<p>接下来就是利用API来获取数据了：新建一个文件weibo_run.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> pymongo <span class="keyword">import</span> MongoClient</span><br><span class="line"></span><br><span class="line">ACCESS_TOKEN = <span class="string">'2.00GrlpNEwp7azCa0cf771a73RorfEE'</span></span><br><span class="line">url = <span class="string">'https://api.weibo.com/2/statuses/public_timeline.json</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">def run():</span></span><br><span class="line"><span class="string">#授权</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    while True:</span></span><br><span class="line"><span class="string">        #调用statuses__public_timeline的api接口</span></span><br><span class="line"><span class="string">        params = &#123;</span></span><br><span class="line"><span class="string">            '</span>access_token<span class="string">': TOKEN</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        statuses = requests.get(url=url, params=params)['</span>statuses<span class="string">']</span></span><br><span class="line"><span class="string">        length = len(statuses)</span></span><br><span class="line"><span class="string">        #这是后来我为了查看获取微博条数设置的</span></span><br><span class="line"><span class="string">        print length</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        #连接mongodb,不需要本地的额外配置</span></span><br><span class="line"><span class="string">        Monclient = MongoClient('</span>localhost<span class="string">', 27017)</span></span><br><span class="line"><span class="string">        db = Monclient['</span>Weibo<span class="string">']</span></span><br><span class="line"><span class="string">        WeiboData = db['</span>HadSelected<span class="string">']</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        #获取的各个数据名应该可以清楚的看出来对应的是什么数据</span></span><br><span class="line"><span class="string">        for i in range(0, length):</span></span><br><span class="line"><span class="string">            created_at = statuses[i]['</span>created_at<span class="string">']</span></span><br><span class="line"><span class="string">            id = statuses[i]['</span>use<span class="string">r']['</span>id<span class="string">']</span></span><br><span class="line"><span class="string">            province = statuses[i]['</span>use<span class="string">r']['</span>province<span class="string">']</span></span><br><span class="line"><span class="string">            city = statuses[i]['</span>use<span class="string">r']['</span>city<span class="string">']</span></span><br><span class="line"><span class="string">            followers_count = statuses[i]['</span>use<span class="string">r']['</span>followers_count<span class="string">']</span></span><br><span class="line"><span class="string">            friends_count = statuses[i]['</span>use<span class="string">r']['</span>friends_count<span class="string">']</span></span><br><span class="line"><span class="string">            statuses_count = statuses[i]['</span>use<span class="string">r']['</span>statuses_count<span class="string">']</span></span><br><span class="line"><span class="string">            url = statuses[i]['</span>use<span class="string">r']['</span>url<span class="string">']</span></span><br><span class="line"><span class="string">            geo = statuses[i]['</span>geo<span class="string">']</span></span><br><span class="line"><span class="string">            comments_count = statuses[i]['</span>comments_count<span class="string">']</span></span><br><span class="line"><span class="string">            reposts_count = statuses[i]['</span>reposts_count<span class="string">']</span></span><br><span class="line"><span class="string">            nickname = statuses[i]['</span>use<span class="string">r']['</span>screen_name<span class="string">']</span></span><br><span class="line"><span class="string">            desc = statuses[i]['</span>use<span class="string">r']['</span>description<span class="string">']</span></span><br><span class="line"><span class="string">            location = statuses[i]['</span>use<span class="string">r']['</span>location<span class="string">']</span></span><br><span class="line"><span class="string">            text = statuses[i]['</span>text<span class="string">']</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">            #插入mongodb</span></span><br><span class="line"><span class="string">            WeiboData.insert_one(&#123;</span></span><br><span class="line"><span class="string">                '</span>created_at<span class="string">': created_at,</span></span><br><span class="line"><span class="string">                '</span>id<span class="string">': id,</span></span><br><span class="line"><span class="string">                '</span>nickname<span class="string">': nickname,</span></span><br><span class="line"><span class="string">                '</span>text<span class="string">': text,</span></span><br><span class="line"><span class="string">                '</span>province<span class="string">': province,</span></span><br><span class="line"><span class="string">                '</span>location<span class="string">': location,</span></span><br><span class="line"><span class="string">                '</span>description<span class="string">': desc,</span></span><br><span class="line"><span class="string">                '</span>city<span class="string">': city,</span></span><br><span class="line"><span class="string">                '</span>followers_count<span class="string">': followers_count,</span></span><br><span class="line"><span class="string">                '</span>friends_count<span class="string">': friends_count,</span></span><br><span class="line"><span class="string">                '</span>statuses_count<span class="string">': statuses_count,</span></span><br><span class="line"><span class="string">                '</span>url<span class="string">': url,</span></span><br><span class="line"><span class="string">                '</span>geo<span class="string">': geo,</span></span><br><span class="line"><span class="string">                '</span>comments_count<span class="string">': comments_count,</span></span><br><span class="line"><span class="string">                '</span>reposts_count<span class="string">': reposts_count</span></span><br><span class="line"><span class="string">                &#125;)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">if __name__ == "__main__":</span></span><br><span class="line"><span class="string">    run()</span></span><br></pre></td></tr></table></figure>
+<p>刚开始我的代码是这样的，看起来已经完成了。</p>
+<p>但是，因为新浪会限制你的调用次数，后来我试了一下重新运行,结果发现了一个问题，我之前的<em>print length</em> 出来的每行获取值都不一样，总是在１６－２０之间徘徊，<strong>这说明了我每次重新运行获取的数据都不一样</strong>.然后我想算了，干脆写个<strong>死循环</strong>看他什么时候再被封吧。于是代码就变成了下面这样</p>
+<p>把<del>run()</del>删除，换成下面这个死循环。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line">      　<span class="keyword">try</span>:</span><br><span class="line">          　run()</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>结果他就一直运行下去了…运行了四天还没有被封，估计是封不了了…</p>
+<p>其他接口也是一样使用，只用改变url和params就行，具体参数参照<a href="http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI" target="_blank" rel="noopener">新浪微博API文档</a></p>
+<p>开始我发现一天可以获取800万的数据，把我给乐的…后来发现好多好多重复的数据。最后找了半天的解决方案，在mongodb中根据用户的id和创建的时间这两点建立索引(因为一个人不可能在同一时刻发送两条微博),最后没有重复数据大概一天可以获取100万条左右的信息。</p>
+<h3 id="请我喝杯咖啡"><a href="#请我喝杯咖啡" class="headerlink" title="请我喝杯咖啡"></a>请我喝杯咖啡</h3><p>如果觉得十分感谢我的内容，可以请我喝杯咖啡～</p>
+<p>支付宝：<br><img src="http://111.230.251.140:8000/images/alipay.png" alt="支付宝"></p>
+<p>or微信:<br><img src="http://111.230.251.140:8000/images/wechatpay.png" alt="微信"></p>
+<h3 id="个人博客"><a href="#个人博客" class="headerlink" title="个人博客"></a>个人博客</h3><p>8aoy1.cn</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/03/python爬取图片/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -345,7 +573,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近在做机器学习下的人脸识别的学习，机器学习这个东西有点暴力，很大程度上靠训练的数据量来决定效果。为了找数据，通过一个<a href="http://blog.csdn.net/chenriwei2/article/details/50631212" target="_blank" rel="noopener">博客</a>的指导，浏览了几个很知名的数据集。</p>
 <p>几个大型数据集是通过发邮件申请进行下载，几个小型数据集直接在网页的链接下载，还有一个<a href="http://www.cs.columbia.edu/CAVE/databases/pubfig/" target="_blank" rel="noopener">Pubfig</a>数据集则是提供了大量图片的链接来让我们自己写程序来下载。</p>
 <p>权衡了数据量的需求，最后选择Pubfig的数据集，于是就自己写了一个python图片采集程序，里面用了urllib和requests两种方法.</p>
@@ -496,7 +724,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
 <h1 id="解决CMAKE编译第三方开源软件需要下载的问题"><a href="#解决CMAKE编译第三方开源软件需要下载的问题" class="headerlink" title="解决CMAKE编译第三方开源软件需要下载的问题"></a>解决CMAKE编译第三方开源软件需要下载的问题</h1><p>经常会出现这种问题：我们从github上面下载了一些开源软件，但是这个开源软件<strong>本身其实是会下载很多其他开源软件</strong>，编译后作为软件的一部分。<br>看起来好像没什么问题，但是有时候这个下载很耗时间，让整个安装变得很慢，它本身的这个下载过程下载东西真的很不稳定。所以就导致了有可能的安装失败。重新多次安装又要多次下载，这个过程真的很浪费时间和网络资源硬盘资源。</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过对于我最近使用的一个软件的cmake过程的研究，发现这个软件安装时进行第三方的包的下载的时候，是通过CMAKE自带的下载和编译功能进行的。所以为了：</p>
 <ul>
@@ -964,7 +1192,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来</p>
 <h2 id="携程"><a href="#携程" class="headerlink" title="携程"></a>携程</h2><h3 id="分析数据"><a href="#分析数据" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;首先我们去携程的<a href="http://you.ctrip.com/sight/gulangyu120058.html" target="_blank" rel="noopener">鼓浪屿景点速览</a>看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结构应该都是差不多的，所以我们选择<a href="http://you.ctrip.com/sight/gulangyu120058/57405.html" target="_blank" rel="noopener">第一个景点</a>进去看看具体的页面应该怎么爬取。</p>
 <p><img src="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg" alt="鼓浪屿评论分析" title="结果"></p>
@@ -1135,7 +1363,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;由于硬件等各种原因需要把大概170多万2t左右的微博图片数据存到Mysql中.之前存微博数据一直用的非关系型数据库mongodb，由于对Mysql的各种不熟悉，踩了无数坑，来来回回改了3天才完成。</p>
 <h2 id="挖坑填坑之旅"><a href="#挖坑填坑之旅" class="headerlink" title="挖坑填坑之旅"></a>挖坑填坑之旅</h2><h3 id="建表"><a href="#建表" class="headerlink" title="建表"></a><strong>建表</strong></h3><p>存数据的时候首先需要设计数据库,我准备设计了3个表</p>
 <p>微博表：[id, userid, blog_text, lat, lng, created_time, reserve]&emsp;&emsp; <strong>pkey: id</strong></p>
@@ -1289,7 +1517,7 @@
       
         
           
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><blockquote>
 <p>参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内容的相似来完成的。(通俗点说就是去噪去噪去噪，然后只留下相对有规律的日期，内容)</p>
 </blockquote>
@@ -1350,257 +1578,6 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 利用goose获取正文内容</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">goose_content</span><span class="params">(my_count, lines, my_url)</span>:</span></span><br><span class="line">    g = Goose(&#123;<span class="string">'stopwords_class'</span>: StopWordsChinese&#125;)</span><br><span class="line">    content_1 = g.extract(url=my_url)</span><br><span class="line">    host = &#123;&#125;</span><br><span class="line">    my_list = []</span><br><span class="line">    host[<span class="string">'content'</span>] = content_1.cleaned_text</span><br><span class="line">    host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">    host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">    result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">    SpiderBBS_info.insert(result)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算余弦相似度函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cos_dist</span><span class="params">(a, b)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> len(a) != len(b):</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    part_up = <span class="number">0.0</span></span><br><span class="line">    a_sq = <span class="number">0.0</span></span><br><span class="line">    b_sq = <span class="number">0.0</span></span><br><span class="line">    <span class="keyword">for</span> a1, b1 <span class="keyword">in</span> zip(a, b):</span><br><span class="line">        part_up += a1 * b1</span><br><span class="line">        a_sq += a1 ** <span class="number">2</span></span><br><span class="line">        b_sq += b1 ** <span class="number">2</span></span><br><span class="line">    part_down = math.sqrt(a_sq * b_sq)</span><br><span class="line">    <span class="keyword">if</span> part_down == <span class="number">0.0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> part_up / part_down</span><br><span class="line"></span><br><span class="line"><span class="comment"># 判断评论内容在哪一行（可能在3行评论块的中间，可能在三行评论块的最后）</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_3_comment</span><span class="params">(my_count, lines)</span>:</span></span><br><span class="line">    get_pd_1 = []</span><br><span class="line">    get_pd_2 = []</span><br><span class="line">    <span class="comment"># 如果间隔为3取出所在行的文本长度</span></span><br><span class="line">    test_sat_1 = []</span><br><span class="line">    test_sat_2 = []</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(len(my_count)<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">if</span> my_count[num+<span class="number">1</span>] - <span class="number">3</span> == my_count[num]:</span><br><span class="line">            pd_1 = (len(lines[my_count[num]]), len(lines[my_count[num]+<span class="number">2</span>]))</span><br><span class="line">            get_pd_1.append(pd_1)</span><br><span class="line">            pd_2 = (len(lines[my_count[num]]), len(lines[my_count[num]+<span class="number">1</span>]))</span><br><span class="line">            get_pd_2.append(pd_2)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i_cos <span class="keyword">in</span> range(len(get_pd_1)<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">for</span> j_cos <span class="keyword">in</span> range(i_cos+<span class="number">1</span>, len(get_pd_1)):</span><br><span class="line">            <span class="comment"># 计算文本余弦相似度</span></span><br><span class="line">            test_sat_1.append(cos_dist(get_pd_1[j_cos], get_pd_1[i_cos]))</span><br><span class="line">            test_sat_2.append(cos_dist(get_pd_2[j_cos], get_pd_2[i_cos]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算余弦相似度的平均值</span></span><br><span class="line">    get_mean_1 = numpy.array(test_sat_1)</span><br><span class="line">    <span class="keyword">print</span> (get_mean_1.mean())</span><br><span class="line">    get_mean_2 = numpy.array(test_sat_2)</span><br><span class="line">    <span class="keyword">print</span> (get_mean_2.mean())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 比较大小返回是否应该按</span></span><br><span class="line">    <span class="keyword">if</span> get_mean_1.mean() &gt;= get_mean_2.mean():</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">elif</span> get_mean_1.mean() &lt; get_mean_2.mean():</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取评论内容</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">solve__3</span><span class="params">(num, my_count, sub, lines, my_url)</span>:</span></span><br><span class="line">    <span class="comment"># 如果get_3_comment()返回的值是1，那么说明最后一行是用户名的可能性更大，否则第一行是用户名的可能性更大</span></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">1</span>:</span><br><span class="line">        host = &#123;&#125;</span><br><span class="line">        my_list = []</span><br><span class="line">        host[<span class="string">'content'</span>] = <span class="string">''</span>.join(lines[my_count[<span class="number">0</span>]+<span class="number">1</span>: my_count[<span class="number">1</span>]+sub[<span class="number">0</span>]<span class="number">-1</span>])</span><br><span class="line">        host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">        host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">        <span class="keyword">for</span> use <span class="keyword">in</span> range(<span class="number">1</span>, len(my_count)<span class="number">-1</span>):</span><br><span class="line">            pl = &#123;<span class="string">'content'</span>: <span class="string">''</span>.join(lines[my_count[use] + <span class="number">1</span>:my_count[use + <span class="number">1</span>] - <span class="number">1</span>]), <span class="string">'date'</span>: lines[my_count[use]],</span><br><span class="line">                  <span class="string">'title'</span>: get_title(my_url)&#125;</span><br><span class="line">            my_list.append(pl)</span><br><span class="line"></span><br><span class="line">        result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">        SpiderBBS_info.insert(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">2</span>:</span><br><span class="line">        host = &#123;&#125;</span><br><span class="line">        my_list = []</span><br><span class="line">        host[<span class="string">'content'</span>] = <span class="string">''</span>.join(lines[my_count[<span class="number">0</span>]+<span class="number">2</span>: my_count[<span class="number">1</span>]+sub[<span class="number">0</span>]])</span><br><span class="line">        host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">        host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">        <span class="keyword">for</span> use <span class="keyword">in</span> range(<span class="number">1</span>, len(my_count) - <span class="number">1</span>):</span><br><span class="line">            pl = &#123;<span class="string">'content'</span>: <span class="string">''</span>.join(lines[my_count[use] + <span class="number">2</span>:my_count[use + <span class="number">1</span>]]), <span class="string">'date'</span>: lines[my_count[use]],</span><br><span class="line">                  <span class="string">'title'</span>: get_title(my_url)&#125;</span><br><span class="line">            my_list.append(pl)</span><br><span class="line"></span><br><span class="line">        result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">        SpiderBBS_info.insert(result)</span><br></pre></td></tr></table></figure>
 <h2 id="展望"><a href="#展望" class="headerlink" title="展望"></a>展望</h2><p>提取的准确率应该要分析更多的bbs网站，优化删除重复词（太粗暴），优化停用词，针对短文本没回复情况的优化，准确提取楼主的用户名等，无奈时间太紧无法进一步优化。才疏学浅，刚学了几个月python，代码难免有不合理的地方，望各位提出宝贵意见。</p>
 
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/利用新浪API实现数据抓取/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/22/利用新浪API实现数据抓取/" itemprop="url">利用新浪API实现数据抓取</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:22:13+08:00">
-                2017-12-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
-                    <span itemprop="name">Web spiders</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com</p>
-<h1 id="利用新浪API实现数据的抓取"><a href="#利用新浪API实现数据的抓取" class="headerlink" title="利用新浪API实现数据的抓取"></a><strong>利用新浪API实现数据的抓取</strong></h1><h3 id="1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。"><a href="#1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。" class="headerlink" title="1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。　"></a><strong><em>1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。</em></strong>　</h3><p><img src="http://111.230.251.140:8000/images/result.png" alt="注册新浪微博" title="结果"><br><br></p>
-<p>我主要抓取了大概4天的数据，图上可以看的出来大概有360万条数据，由于是在自己的电脑上爬取做数据的，有时候晚上断网了就间断了，所以大概一天可以爬取有100万左右的<strong>最新微博数据</strong>（因为我调用的是最新的微博API　<a href="http://open.weibo.com/wiki/2/statuses/public_timeline" target="_blank" rel="noopener">public_timeline</a>)</p>
-<p>API文档当中定义了很多返回的类型（以json数据格式返回，我选取了一些我认为重要的信息抓取下来<em>如图所示</em>:　大概有<strong>id号</strong>，<strong>所在位置</strong>，<strong>粉丝数</strong>，发的<strong>微博内容</strong>，发微博的<strong>时间</strong>等等。　当然这些数据都可以根据自己的需要进行定制。)</p>
-<h4 id="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦"><a href="#大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦" class="headerlink" title="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦"></a>大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦</h4><h3 id="2-前期准备"><a href="#2-前期准备" class="headerlink" title="2.　前期准备　"></a><strong><em>2.　前期准备</em></strong>　</h3><p><strong>我们需要的东西：</strong></p>
-<ul>
-<li>数据库:　mongodb（可以使用客户端<a href="https://mongobooster.com/downloads" target="_blank" rel="noopener">MongoBooster</a>)</li>
-<li>开发环境：　Python2.7(我用的IDE是<a href="https://www.jetbrains.com/pycharm/" target="_blank" rel="noopener">Pycharm</a>)</li>
-<li>一个新浪开发者账号：　用自己的新浪微博账号注册就行（后面会讲）</li>
-<li>需要的库：　<a href="http://github.liaoxuefeng.com/sinaweibopy/" target="_blank" rel="noopener">sinaweibopy</a>和pymongo(这些都可以在Pycharm中下载)</li>
-</ul>
-<h4 id="2-1-mongodb的安装"><a href="#2-1-mongodb的安装" class="headerlink" title="2.1　mongodb的安装"></a>2.1　mongodb的安装</h4><p>MongoDB是一个高性能，开源，无模式的文档型数据库，是当前NoSql数据库中比较热门的一种。它在许多场景下可用于替代传统的关系型数据库或键/值存储方式。Mongo使用C++开发。Mongo的官方网站地址是：<a href="http://www.mongodb.org/" target="_blank" rel="noopener">http://www.mongodb.org/</a>，读者可以在此获得更详细的信息。</p>
-<blockquote>
-<p>小插曲：什么是NoSql?</p>
-<p>　　NoSql，全称是 Not Only Sql,指的是非关系型的数据库。下一代数据库主要解决几个要点：非关系型的、分布式的、开源的、水平可扩展的。原始的目的是为了大规模web应用，这场运动开始于2009年初，通常特性应用如：模式自由、支持简易复制、简单的API、最终的一致性（非ACID）、大容量数据等。NoSQL被我们用得最多的当数key-value存储，当然还有其他的文档型的、列存储、图型数据库、xml数据库等。</p>
-</blockquote>
-<h4 id="网上有很多安装mongodb教程我就不写了"><a href="#网上有很多安装mongodb教程我就不写了" class="headerlink" title="网上有很多安装mongodb教程我就不写了"></a>网上有很多安装mongodb教程我就不写了</h4><p><a href="http://www.runoob.com/mongodb/mongodb-window-install.html" target="_blank" rel="noopener">Windows下mongodb的安装</a></p>
-<p><a href="http://www.runoob.com/mongodb/mongodb-linux-install.html" target="_blank" rel="noopener">Linux下mongodb的安装</a></p>
-<h4 id="2-2-新浪开发者账号的注册方法"><a href="#2-2-新浪开发者账号的注册方法" class="headerlink" title="2.2　新浪开发者账号的注册方法"></a>2.2　新浪开发者账号的注册方法</h4><ul>
-<li><strong>注册新浪微博账号（163邮箱、手机号）</strong></li>
-</ul>
-<p><img src="http://111.230.251.140:8000/images/sina1.png" alt="注册新浪微博" title="注册新浪微博"></p>
-<p>　　<strong> 创建完毕需要填写手机号验证 </strong><br><br></p>
-<ul>
-<li><strong>进入新浪开放者平台：<a href="http://open.weibo.com/" target="_blank" rel="noopener">http://open.weibo.com/</a></strong></li>
-</ul>
-<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
-<p><img src="http://111.230.251.140:8000/images/sina3.png" alt="sina"><br><br></p>
-<p><img src="http://111.230.251.140:8000/images/sina4.png" alt="sina"></p>
-<ul>
-<li><strong>点击继续创建</strong></li>
-</ul>
-<p>初次创建应用需要填写如下信息：</p>
-<p><img src="http://111.230.251.140:8000/images/sina5.png" alt="sina"></p>
-<p>此页面信息不需要填写真实信息，如地区，电话，可随意填写。网站填<a href="https://www.baidu.com/" target="_blank" rel="noopener">https://www.baidu.com/</a>即可。(邮箱要真实)</p>
-<p>继续创建应用。应用名称自定义，平台如下勾选 ios 、andrioid</p>
-<p><img src="http://111.230.251.140:8000/images/sina6.png" alt="sina"></p>
-<p>创建完毕直接返回继续创建，一个账号可以创建10个应用，每个应用对应一个access-token(事实上我只用了一个就可以满足需求)</p>
-<ul>
-<li><strong>前往<a href="http://open.weibo.com/tools/console" target="_blank" rel="noopener">API测试平台</a></strong></li>
-</ul>
-<p><img src="http://111.230.251.140:8000/images/sina7.png" alt="sina"><br><br></p>
-<p><img src="http://111.230.251.140:8000/images/sina8.png" alt="sina"><br><br></p>
-<p>依次选取创建的应用。点<img src="http://111.230.251.140:8000/images/sina9.png" alt="sina">将下方的token用txt保存即可。</p>
-<ul>
-<li><strong>获取key</strong></li>
-</ul>
-<p>回到</p>
-<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
-<p>点击<strong>我的应用</strong></p>
-<p>然后选择自己刚刚创建的应用</p>
-<p><img src="http://111.230.251.140:8000/images/sina10.png" alt="sina"></p>
-<p>进入之后点击<strong>应用信息</strong></p>
-<p><img src="http://111.230.251.140:8000/images/sina11.png" alt="sina"></p>
-<p>保存下　<strong>APP Key</strong> 和　<strong>APP Secret</strong></p>
-<p>点击<strong>高级信息</strong></p>
-<p>设置回调网址</p>
-<p><img src="http://111.230.251.140:8000/images/sina12.png" alt="sina"></p>
-<p>可以设置成默认的<br><a href="http://api.weibo.com/oauth2/default.html" target="_blank" rel="noopener">http://api.weibo.com/oauth2/default.html</a></p>
-<p>至此你的开发者账号就已经完成了</p>
-<h4 id="2-3-依赖库的安装方法"><a href="#2-3-依赖库的安装方法" class="headerlink" title="2.3　依赖库的安装方法"></a>2.3　依赖库的安装方法</h4><p><a href="http://github.liaoxuefeng.com/sinaweibopy/" target="_blank" rel="noopener">sinaweibopy</a>和pymongo的安装</p>
-<p>可以直接用pip安装<br><strong>pip install sinaweibopy</strong>　和　<strong>pip install pymongo</strong></p>
-<p>也可以在Pycharm里面直接安装</p>
-<p>选择File -&gt; Settings -&gt; Project -&gt; Project Interpreter</p>
-<p><img src="http://111.230.251.140:8000/images/Screenshot from 2016-12-18 10-56-56.png" alt="Pycharm"></p>
-<p>可以看到自己安装的Python库，点击右边的绿色<strong>　＋　</strong> 号</p>
-<p><img src="http://111.230.251.140:8000/images/Screenshot from 2016-12-18 11-02-00.png" alt="Pycharm"></p>
-<p>安装即可</p>
-<h3 id="3-分析问题"><a href="#3-分析问题" class="headerlink" title="3.　分析问题　"></a><strong><em>3.　分析问题</em></strong>　</h3><h4 id="3-1-OAuth-认证"><a href="#3-1-OAuth-认证" class="headerlink" title="3.1 OAuth 认证"></a><strong>3.1 OAuth 认证</strong></h4><p><strong> 授权机制说明（很重要）</strong></p>
-<p>网上很多讲利用新浪微博API发送微博什么的都是使用的<strong>请求用户授权Token</strong>这种方式，但是这种方式显然不适用于我们爬取数据，因为每次都要请求，每次都要重新获取code。具体可参考<a href="http://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6%E8%AF%B4%E6%98%8E" target="_blank" rel="noopener">新浪微博API的授权机制</a></p>
-<p>廖雪峰老师(sinaweibopy 的贡献者）也对这个授权机制有一个说明</p>
-<blockquote>
-<p>通过新浪微博的API接入网站，由于用户无需在您的网站上注册，就可以直接?使用他／她在新浪微博的帐号和口令登录您的网站，这就需要确保您的网站在无需知道，也不能知道用户口令的情况下确认用户已经登录成功。由于用户的口令存储在新浪微博，因此，认证用户的过程只能由新浪微博完成，但新浪微博如何与您的网站通信并告知您用户是否登录成功呢？这个过程称之为第三方登录，OAuth是一个标准的第三方登录协议，借助OAuth，您的网站就可以安全地接入来自新浪微博登录成功的用户。</p>
-<p>OAuth目前主要有1.0和2.0两个版本，2.0版对1.0版做了大量简化，API也更简单。新浪微博最新的API也是采用的OAuth 2.0，整个登录流程如下：</p>
-<ol>
-<li>用户在您的网站上点击“使用新浪微博登录”，您的网站将用户重定向到新浪微博的OAuth认证页，重定向链接中包含client_id参数作为您的网站ID，redirect_uri参数告诉新浪微博当用户登录成功后，将浏览器重定向到您的网站；</li>
-<li>用户在新浪微博的认证页输入帐号和口令；</li>
-<li>新浪微博认证成功后，将浏览器重定向到您的网站，并附上code参数；</li>
-<li>您的网站通过code参数向新浪微博请求用户的access token；</li>
-<li>您的网站拿到用户的access token后，用户登录完成。<br>OAuth的access token是提供认证服务的网站（例如新浪微博）生成的令牌，代表一个用户认证信息。在随后的API调用中，传入该access token就代表这个登录用户，这样，通过OAuth协议，您的网站将验证用户的步骤交给新浪微博完成，并由新浪微博告知您用户是否登录成功。</li>
-</ol>
-<p>OAuth的安全性是通过步骤4完成的，通过code参数获取access token的过程是您的网站后台到新浪微博网站完成的，用户无法看到获取access token的HTTP请求。如果用户传入伪造的code，则新浪微博会返回一个错误。</p>
-</blockquote>
-<p>具体内容请看<a href="http://www.liaoxuefeng.com/article/00137389308005720bf24cb6cf14d9e897e7026dbc6a842000" target="_blank" rel="noopener">廖雪峰老师的文档</a></p>
-<p>大致上来说按照一般的请求用户授权Token调用会出现这种情况：</p>
-<p><img src="http://111.230.251.140:8000/images/sina14.png" alt="登录微博" title="登录微博"><br><br></p>
-<p><img src="http://111.230.251.140:8000/images/sina13.png" alt="获取code" title="获取code"></p>
-<p>登陆后会调转到一个连接<a href="https://api.weibo.com/oauth2/default.html?code=××××××××" target="_blank" rel="noopener">https://api.weibo.com/oauth2/default.html?code=××××××××</a>　</p>
-<p>我们所需要的就是code=××××××××××　的值</p>
-<h4 id="也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站"><a href="#也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站" class="headerlink" title="也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站　"></a><strong>也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站</strong>　</h4><p>怎么解决问题呢？首先我们想到的自然是在Python程序里面模拟登录新浪微博，然后自然可以获取到code的值，但是，模拟新浪微博登录相对来说比较复杂，而且既然都模拟登录成功了，为啥还要调用API呢…直接自定义进行抓取不是更加方便。</p>
-<p><strong>如果看了上面的那个授权机制，就应该想到。这个时候就需要我们之前申请的access-token了</strong></p>
-<p>access-token 根据我的理解就是把你的微博授权给了第三方让他帮你做一些事情，类似于在你的手机端通过新浪微博来登录然后进行操作(利用上面授权机制里面讲的一句话来说就是)<em>移动端应用可直接使用官方移动SDK，通过呼起微博客户端（未安装微博客户端的会呼起H5授权页）方式授权</em></p>
-<p>这个界面你应该很熟悉</p>
-<p><img src="http://111.230.251.140:8000/images/sina15.png" alt="新浪授权" title="新浪授权"></p>
-<p>新浪也给出了说明<a href="http://open.weibo.com/wiki/Oauth2/access_token" target="_blank" rel="noopener">Oauth2/access token</a></p>
-<p>查看廖雪峰老师的<a href="https://github.com/michaelliao/sinaweibopy/blob/master/weibo.py" target="_blank" rel="noopener">sinaweibopy</a>可以看到set_access_token函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def set_access_token(self, access_token, expires):</span><br><span class="line">        self.access_token = str(access_token)</span><br><span class="line">        self.expires = float(expires)</span><br></pre></td></tr></table></figure></p>
-<p>可以看出access_token　已经有了，还差expires</p>
-<p>这个expires指的是什么<br>同样新浪也给了一个说明<a href="http://open.weibo.com/wiki/Oauth2/get_token_info" target="_blank" rel="noopener">oauth2/get_token_info</a></p>
-<p>查询用户access_token的授权相关信息，包括授权时间，过期时间和scope权限。</p>
-<p>分析到这全部结束了，我们只需要获取４个数据就可以完成所有的操作。<br>APP_KEY　　APP_SECRET　　CALL_BACK　　ACCESS_TOKEN</p>
-<h3 id="４-代码实现"><a href="#４-代码实现" class="headerlink" title="４.　代码实现　"></a><strong><em>４.　代码实现</em></strong>　</h3><p>首先我们先新建一个Python文件命名为InitClient.py<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> weibo</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myAPIClient</span><span class="params">(weibo.APIClient)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, app_key, app_secret, redirect_uri, access_token)</span>:</span></span><br><span class="line">        weibo.APIClient.__init__(self, app_key, app_secret, redirect_uri, access_token)</span><br><span class="line"></span><br><span class="line"><span class="comment">#获取expire的值</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">request_access_token_info</span><span class="params">(self, access_token)</span>:</span></span><br><span class="line">        r = weibo._http_post(<span class="string">'%s%s'</span> % (self.auth_url, <span class="string">'get_token_info'</span>), access_token=access_token)</span><br><span class="line">        current = int(time.time())</span><br><span class="line">        expires = r.expire_in + current</span><br><span class="line">        <span class="keyword">return</span> weibo.JsonDict(expires_in=expires)</span><br><span class="line"></span><br><span class="line">＃获取权限</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_client</span><span class="params">(appkey, appsecret, callback, access_token)</span>:</span></span><br><span class="line">    client = myAPIClient(appkey, appsecret, callback, access_token)</span><br><span class="line">    r = client.request_access_token_info(access_token)</span><br><span class="line">    expires_in = r.expires_in</span><br><span class="line">    client.set_access_token(access_token, expires_in)</span><br><span class="line">    <span class="keyword">return</span> client</span><br></pre></td></tr></table></figure></p>
-<p>代码不长，函数名啊什么的写的很清楚，应该不难看懂…</p>
-<p>接下来就是利用API来获取数据了：新建一个文件weibo.py</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> InitClient</span><br><span class="line"><span class="keyword">from</span> pymongo <span class="keyword">import</span> MongoClient</span><br><span class="line"></span><br><span class="line">APP_KEY = <span class="string">'4205885419'</span></span><br><span class="line">APP_SECRET = <span class="string">'892c885ff32a4b452be58cda23c1cea6'</span></span><br><span class="line">CALL_BACK = <span class="string">'http://api.weibo.com/oauth2/default.html'</span></span><br><span class="line">ACCESS_TOKEN = <span class="string">'2.00GrlpNEwp7azCa0cf771a73RorfEE'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">()</span>:</span></span><br><span class="line"><span class="comment">#授权</span></span><br><span class="line">    client = InitClient.get_client(APP_KEY, APP_SECRET, CALL_BACK, ACCESS_TOKEN)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line"><span class="comment">#调用statuses__public_timeline的api接口</span></span><br><span class="line">        statuses = client.statuses__public_timeline()[<span class="string">'statuses'</span>]</span><br><span class="line">        length = len(statuses)</span><br><span class="line"><span class="comment">#这是后来我为了查看获取微博条数设置的</span></span><br><span class="line">        <span class="keyword">print</span> length</span><br><span class="line"></span><br><span class="line"><span class="comment">#连接mongodb,不需要本地的额外配置</span></span><br><span class="line">        Monclient = MongoClient(<span class="string">'localhost'</span>, <span class="number">27017</span>)</span><br><span class="line">        db = Monclient[<span class="string">'Weibo'</span>]</span><br><span class="line">＃为什么取名叫做HadSelected？是因为刚开始的时候没有去重，这是改之后的名字</span><br><span class="line">        WeiboData = db[<span class="string">'HadSelected'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#获取的各个数据名应该可以清楚的看出来对应的是什么数据</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, length):</span><br><span class="line">            created_at = statuses[i][<span class="string">'created_at'</span>]</span><br><span class="line">            id = statuses[i][<span class="string">'user'</span>][<span class="string">'id'</span>]</span><br><span class="line">            province = statuses[i][<span class="string">'user'</span>][<span class="string">'province'</span>]</span><br><span class="line">            city = statuses[i][<span class="string">'user'</span>][<span class="string">'city'</span>]</span><br><span class="line">            followers_count = statuses[i][<span class="string">'user'</span>][<span class="string">'followers_count'</span>]</span><br><span class="line">            friends_count = statuses[i][<span class="string">'user'</span>][<span class="string">'friends_count'</span>]</span><br><span class="line">            statuses_count = statuses[i][<span class="string">'user'</span>][<span class="string">'statuses_count'</span>]</span><br><span class="line">            url = statuses[i][<span class="string">'user'</span>][<span class="string">'url'</span>]</span><br><span class="line">            geo = statuses[i][<span class="string">'geo'</span>]</span><br><span class="line">            comments_count = statuses[i][<span class="string">'comments_count'</span>]</span><br><span class="line">            reposts_count = statuses[i][<span class="string">'reposts_count'</span>]</span><br><span class="line">            nickname = statuses[i][<span class="string">'user'</span>][<span class="string">'screen_name'</span>]</span><br><span class="line">            desc = statuses[i][<span class="string">'user'</span>][<span class="string">'description'</span>]</span><br><span class="line">            location = statuses[i][<span class="string">'user'</span>][<span class="string">'location'</span>]</span><br><span class="line">            text = statuses[i][<span class="string">'text'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#插入mongodb</span></span><br><span class="line">            WeiboData.insert_one(&#123;</span><br><span class="line">                <span class="string">'created_at'</span>: created_at,</span><br><span class="line">                <span class="string">'id'</span>: id,</span><br><span class="line">                <span class="string">'nickname'</span>: nickname,</span><br><span class="line">                <span class="string">'text'</span>: text,</span><br><span class="line">                <span class="string">'province'</span>: province,</span><br><span class="line">                <span class="string">'location'</span>: location,</span><br><span class="line">                <span class="string">'description'</span>: desc,</span><br><span class="line">                <span class="string">'city'</span>: city,</span><br><span class="line">                <span class="string">'followers_count'</span>: followers_count,</span><br><span class="line">                <span class="string">'friends_count'</span>: friends_count,</span><br><span class="line">                <span class="string">'statuses_count'</span>: statuses_count,</span><br><span class="line">                <span class="string">'url'</span>: url,</span><br><span class="line">                <span class="string">'geo'</span>: geo,</span><br><span class="line">                <span class="string">'comments_count'</span>: comments_count,</span><br><span class="line">                <span class="string">'reposts_count'</span>: reposts_count</span><br><span class="line">                &#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    run()</span><br></pre></td></tr></table></figure>
-<p>刚开始我的代码是这样的，看起来已经完成了。</p>
-<p>但是，因为新浪会限制你的调用次数，后来我试了一下重新运行,结果发现了一个问题，我之前的<em>print length</em> 出来的每行获取值都不一样，总是在１６－２０之间徘徊，<strong>这说明了我每次重新运行获取的数据都不一样</strong>.然后我想算了，干脆写个<strong>死循环</strong>看他什么时候再被封吧。于是代码就变成了下面这样</p>
-<p>把<del>run()</del>删除，换成下面这个死循环。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line">      　<span class="keyword">try</span>:</span><br><span class="line">          　run()</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
-<p>结果他就一直运行下去了…运行了四天还没有被封，估计是封不了了…</p>
-<p>开始我发现一天可以获取800万的数据，把我给乐的…后来发现好多好多重复的数据。最后找了半天的解决方案，在mongodb中根据用户的id和创建的时间这两点建立索引(因为一个人不可能在同一时刻发送两条微博),最后没有重复数据大概一天可以获取100万条左右的信息。但是这总共不到100行的代码，这样就不错了（虽然代码写的很丑）…</p>
-<h3 id="诚挚希望有缘人看到把我这个投-wu-机-bi-取-chou-巧-lou-的代码优化下…感激不尽"><a href="#诚挚希望有缘人看到把我这个投-wu-机-bi-取-chou-巧-lou-的代码优化下…感激不尽" class="headerlink" title="诚挚希望有缘人看到把我这个投(wu)机(bi)取(chou)巧(lou)的代码优化下…感激不尽"></a>诚挚希望有缘人看到把我这个投(wu)机(bi)取(chou)巧(lou)的代码优化下…感激不尽</h3>
           
         
       
