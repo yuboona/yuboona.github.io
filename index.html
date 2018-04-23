@@ -252,6 +252,135 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/23/MongoDB的find函数如何使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/23/MongoDB的find函数如何使用/" itemprop="url">MongoDB的find函数如何搜东西（初级）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-23T14:51:00+08:00">
+                2018-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="MongoDB的find函数如何使用"><a href="#MongoDB的find函数如何使用" class="headerlink" title="MongoDB的find函数如何使用"></a><strong>MongoDB的find函数如何使用</strong></h1><hr>
+<h2 id="1、Why-为什么使用find-函数"><a href="#1、Why-为什么使用find-函数" class="headerlink" title="1、Why?为什么使用find()函数"></a>1、Why?为什么使用find()函数</h2><p>我在mongo中存储的数据是爬网页的json数据，结构较为复杂，json内部嵌套的很厉害，光靠眼睛来看找数据好像有点困难。pycharm上的插件提供了搜查功能，可是我发现，但仍然还是要自己用json的格式提供要搜的关键词和值。经过搜集也可以发现其实这个功能只是对find()函数的一个封装。<br>所以，我们要用find()</p>
+<h2 id="2、示例数据"><a href="#2、示例数据" class="headerlink" title="2、示例数据"></a>2、示例数据</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">示例数据json:</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"_id"</span>: &#123;</span><br><span class="line">        <span class="attr">"$oid"</span>: <span class="string">"5adcae9b3fa8b06fdbe7184e"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"json"</span>: &#123;</span><br><span class="line">        <span class="attr">"sjkList"</span>: [&#123;</span><br><span class="line">            <span class="attr">"jxbmc"</span>: <span class="string">"面向对象程序设计课程设计-0022"</span>,</span><br><span class="line">            <span class="attr">"userModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"roleCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"status"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"monitor"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleKeys"</span>: <span class="string">""</span>,</span><br><span class="line">                <span class="attr">"usable"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleValues"</span>: <span class="string">""</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"jgpxzd"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"totalResult"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"zhxs"</span>: <span class="string">"2"</span>,</span><br><span class="line">            <span class="attr">"qsz"</span>: <span class="string">"21"</span>,</span><br><span class="line">            <span class="attr">"listnav"</span>: <span class="string">"false"</span>,</span><br><span class="line">            <span class="attr">"jxb_id"</span>: <span class="string">"62DAED714DEEA4ECE0530C0114AC99EB"</span>,</span><br><span class="line">            <span class="attr">"xqdm"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"kcmc"</span>: <span class="string">"面向对象程序设计课程设计"</span>,</span><br><span class="line">            <span class="attr">"localeKey"</span>: <span class="string">"zh_CN"</span>,</span><br><span class="line">            <span class="attr">"sfsjk"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"xm"</span>: <span class="string">"孙斌"</span>,</span><br><span class="line">            <span class="attr">"xqh_id"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"rsdzjs"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"zzz"</span>: <span class="string">"22"</span>,</span><br><span class="line">            <span class="attr">"rangeable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"jxbzh"</span>: <span class="string">"117171;117172"</span>,</span><br><span class="line">            <span class="attr">"pageable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"queryModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"totalPage"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentPage"</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">"totalCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"entityOrField"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"pageNo"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"offset"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"pageSize"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"limit"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"totalResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"showCount"</span>: <span class="number">10</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            <span class="attr">"jxbmc"</span>: <span class="string">"自然地理与地质学实习-0003"</span>,</span><br><span class="line">            <span class="attr">"userModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"roleCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"status"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"monitor"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleKeys"</span>: <span class="string">""</span>,</span><br><span class="line">                <span class="attr">"usable"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleValues"</span>: <span class="string">""</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"jgpxzd"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"totalResult"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"zhxs"</span>: <span class="string">"2"</span>,</span><br><span class="line">            <span class="attr">"qsz"</span>: <span class="string">"22"</span>,</span><br><span class="line">            <span class="attr">"listnav"</span>: <span class="string">"false"</span>,</span><br><span class="line">            <span class="attr">"jxb_id"</span>: <span class="string">"5F7A59A6AB1521FDE0530B0114ACF30A"</span>,</span><br><span class="line">            <span class="attr">"xqdm"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"kcmc"</span>: <span class="string">"自然地理与地质学实习"</span>,</span><br><span class="line">            <span class="attr">"localeKey"</span>: <span class="string">"zh_CN"</span>,</span><br><span class="line">            <span class="attr">"sfsjk"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"xm"</span>: <span class="string">"孙斌"</span>,</span><br><span class="line">            <span class="attr">"xqh_id"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"rsdzjs"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"zzz"</span>: <span class="string">"23"</span>,</span><br><span class="line">            <span class="attr">"rangeable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"jxbzh"</span>: <span class="string">"117171;117172"</span>,</span><br><span class="line">            <span class="attr">"pageable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"queryModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"totalPage"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentPage"</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">"totalCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"entityOrField"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"pageNo"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"offset"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"pageSize"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"limit"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"totalResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"showCount"</span>: <span class="number">10</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3、find-怎么用"><a href="#3、find-怎么用" class="headerlink" title="3、find()怎么用"></a>3、find()怎么用</h2><p>find()函数的基本用法很简单</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line">MongoClient[<span class="string">'你的库名'</span>][<span class="string">'你的表名'</span>].find(&#123;<span class="string">'key'</span>:<span class="string">'要搜的value'</span>&#125;)</span><br></pre></td></tr></table></figure>
+<p>但是对应实例数据，复杂json嵌套数据下这个简单的搜索方法好像没用，找了很久网页，基本都是浅尝辄止，或者介绍的和我关心的不在一个频道。</p>
+<p>但是后来还是找到了正确的方法：<br>可以看到第二个关键字’json’中的嵌套了数组，数组的组成单位是json串<br>为了获得”jxb_id”: “5F7A59A6AB1521FDE0530B0114ACF30A”这个关键词对应的数据，我们可以使用如下方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line">MongoClient[<span class="string">'你的库名'</span>][<span class="string">'你的表名'</span>].find(&#123;<span class="string">"json.sjkList.jxb_id"</span> : <span class="string">"5F7A59A6AB1521FDE0530B0114ACF30A"</span>&#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="4、如何理解"><a href="#4、如何理解" class="headerlink" title="4、如何理解"></a>4、如何理解</h2><p>想要理解为什么会这样来用，其实看一下mongodb的一些基本的命令行操作，会有一点启发，基本都会有’.’这个操作符号，这个操作符像是在往对象的内部不断地纵深。</p>
+<p>我们把每个关键字对应的值理解为一个对象，为了进入对象内部，用’.’来操作也就很理所当然了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/利用新浪API实现数据抓取/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -428,9 +557,6 @@
 <p>结果他就一直运行下去了…运行了四天还没有被封，估计是封不了了…</p>
 <p>其他接口也是一样使用，只用改变url和params就行，具体参数参照<a href="http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI" target="_blank" rel="noopener">新浪微博API文档</a></p>
 <p>开始我发现一天可以获取800万的数据，把我给乐的…后来发现好多好多重复的数据。最后找了半天的解决方案，在mongodb中根据用户的id和创建的时间这两点建立索引(因为一个人不可能在同一时刻发送两条微博),最后没有重复数据大概一天可以获取100万条左右的信息。</p>
-<h3 id="请我喝杯咖啡"><a href="#请我喝杯咖啡" class="headerlink" title="请我喝杯咖啡"></a>请我喝杯咖啡</h3><p>如果觉得十分感谢我的内容，可以请我喝杯咖啡～</p>
-<p>支付宝：<br><img src="http://111.230.251.140:8000/images/alipay.png" alt="支付宝"></p>
-<p>or微信:<br><img src="http://111.230.251.140:8000/images/wechatpay.png" alt="微信"></p>
 <h3 id="个人博客"><a href="#个人博客" class="headerlink" title="个人博客"></a>个人博客</h3><p>8aoy1.cn</p>
 
           
@@ -1753,151 +1879,13 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/19/Start/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/19/Start/" itemprop="url">start</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-19T20:07:50+08:00">
-                2017-12-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Living/" itemprop="url" rel="index">
-                    <span itemprop="name">Living</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Start-of-my-BLOG"><a href="#Start-of-my-BLOG" class="headerlink" title="Start of my BLOG"></a>Start of my BLOG</h1><h2 id="This-is-a-place-where-I-explore-the-world"><a href="#This-is-a-place-where-I-explore-the-world" class="headerlink" title="This is a place where I explore the world."></a>This is a place where I explore the <em>world</em>.</h2><p><img src="/2017/12/19/Start/timg.jpg" alt="图片一"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For a long time, I have incorrectly hold the view that the knowledge as well as the capability come from clever mind.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;But the fact has taught me more, no one can just create without learning from other’s job and experience.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Be a willing and stubborn learner,finding the real knowledge and  capability.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -1941,7 +1929,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
