@@ -252,7 +252,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/23/MongoDB的find函数如何使用/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/通用论坛正文提取/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yuboona Zhang">
@@ -271,7 +271,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/23/MongoDB的find函数如何使用/" itemprop="url">MongoDB的find函数如何搜东西（初级）</a></h1>
+                <a class="post-title-link" href="/2020/01/12/通用论坛正文提取/" itemprop="url">通用论坛正文提取</a></h1>
         
 
         <div class="post-meta">
@@ -283,1306 +283,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-23T14:51:00+08:00">
-                2018-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="MongoDB的find函数如何使用"><a href="#MongoDB的find函数如何使用" class="headerlink" title="MongoDB的find函数如何使用"></a><strong>MongoDB的find函数如何使用</strong></h1><hr>
-<h2 id="1、Why-为什么使用find-函数"><a href="#1、Why-为什么使用find-函数" class="headerlink" title="1、Why?为什么使用find()函数"></a>1、Why?为什么使用find()函数</h2><p>我在mongo中存储的数据是爬网页的json数据，结构较为复杂，json内部嵌套的很厉害，光靠眼睛来看找数据好像有点困难。pycharm上的插件提供了搜查功能，可是我发现，但仍然还是要自己用json的格式提供要搜的关键词和值。经过搜集也可以发现其实这个功能只是对find()函数的一个封装。<br>所以，我们要用find()</p>
-<h2 id="2、示例数据"><a href="#2、示例数据" class="headerlink" title="2、示例数据"></a>2、示例数据</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">示例数据json:</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"_id"</span>: &#123;</span><br><span class="line">        <span class="attr">"$oid"</span>: <span class="string">"5adcae9b3fa8b06fdbe7184e"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"json"</span>: &#123;</span><br><span class="line">        <span class="attr">"sjkList"</span>: [&#123;</span><br><span class="line">            <span class="attr">"jxbmc"</span>: <span class="string">"面向对象程序设计课程设计-0022"</span>,</span><br><span class="line">            <span class="attr">"userModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"roleCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"status"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"monitor"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleKeys"</span>: <span class="string">""</span>,</span><br><span class="line">                <span class="attr">"usable"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleValues"</span>: <span class="string">""</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"jgpxzd"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"totalResult"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"zhxs"</span>: <span class="string">"2"</span>,</span><br><span class="line">            <span class="attr">"qsz"</span>: <span class="string">"21"</span>,</span><br><span class="line">            <span class="attr">"listnav"</span>: <span class="string">"false"</span>,</span><br><span class="line">            <span class="attr">"jxb_id"</span>: <span class="string">"62DAED714DEEA4ECE0530C0114AC99EB"</span>,</span><br><span class="line">            <span class="attr">"xqdm"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"kcmc"</span>: <span class="string">"面向对象程序设计课程设计"</span>,</span><br><span class="line">            <span class="attr">"localeKey"</span>: <span class="string">"zh_CN"</span>,</span><br><span class="line">            <span class="attr">"sfsjk"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"xm"</span>: <span class="string">"孙斌"</span>,</span><br><span class="line">            <span class="attr">"xqh_id"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"rsdzjs"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"zzz"</span>: <span class="string">"22"</span>,</span><br><span class="line">            <span class="attr">"rangeable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"jxbzh"</span>: <span class="string">"117171;117172"</span>,</span><br><span class="line">            <span class="attr">"pageable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"queryModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"totalPage"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentPage"</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">"totalCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"entityOrField"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"pageNo"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"offset"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"pageSize"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"limit"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"totalResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"showCount"</span>: <span class="number">10</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            <span class="attr">"jxbmc"</span>: <span class="string">"自然地理与地质学实习-0003"</span>,</span><br><span class="line">            <span class="attr">"userModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"roleCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"status"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"monitor"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleKeys"</span>: <span class="string">""</span>,</span><br><span class="line">                <span class="attr">"usable"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleValues"</span>: <span class="string">""</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"jgpxzd"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"totalResult"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"zhxs"</span>: <span class="string">"2"</span>,</span><br><span class="line">            <span class="attr">"qsz"</span>: <span class="string">"22"</span>,</span><br><span class="line">            <span class="attr">"listnav"</span>: <span class="string">"false"</span>,</span><br><span class="line">            <span class="attr">"jxb_id"</span>: <span class="string">"5F7A59A6AB1521FDE0530B0114ACF30A"</span>,</span><br><span class="line">            <span class="attr">"xqdm"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"kcmc"</span>: <span class="string">"自然地理与地质学实习"</span>,</span><br><span class="line">            <span class="attr">"localeKey"</span>: <span class="string">"zh_CN"</span>,</span><br><span class="line">            <span class="attr">"sfsjk"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"xm"</span>: <span class="string">"孙斌"</span>,</span><br><span class="line">            <span class="attr">"xqh_id"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"rsdzjs"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"zzz"</span>: <span class="string">"23"</span>,</span><br><span class="line">            <span class="attr">"rangeable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"jxbzh"</span>: <span class="string">"117171;117172"</span>,</span><br><span class="line">            <span class="attr">"pageable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"queryModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"totalPage"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentPage"</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">"totalCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"entityOrField"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"pageNo"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"offset"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"pageSize"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"limit"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"totalResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"showCount"</span>: <span class="number">10</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="3、find-怎么用"><a href="#3、find-怎么用" class="headerlink" title="3、find()怎么用"></a>3、find()怎么用</h2><p>find()函数的基本用法很简单</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line">MongoClient[<span class="string">'你的库名'</span>][<span class="string">'你的表名'</span>].find(&#123;<span class="string">'key'</span>:<span class="string">'要搜的value'</span>&#125;)</span><br></pre></td></tr></table></figure>
-<p>但是对应实例数据，复杂json嵌套数据下这个简单的搜索方法好像没用，找了很久网页，基本都是浅尝辄止，或者介绍的和我关心的不在一个频道。</p>
-<p>但是后来还是找到了正确的方法：<br>可以看到第二个关键字’json’中的嵌套了数组，数组的组成单位是json串<br>为了获得”jxb_id”: “5F7A59A6AB1521FDE0530B0114ACF30A”这个关键词对应的数据，我们可以使用如下方法</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line">MongoClient[<span class="string">'你的库名'</span>][<span class="string">'你的表名'</span>].find(&#123;<span class="string">"json.sjkList.jxb_id"</span> : <span class="string">"5F7A59A6AB1521FDE0530B0114ACF30A"</span>&#125;)</span><br></pre></td></tr></table></figure>
-<h2 id="4、如何理解"><a href="#4、如何理解" class="headerlink" title="4、如何理解"></a>4、如何理解</h2><p>想要理解为什么会这样来用，其实看一下mongodb的一些基本的命令行操作，会有一点启发，基本都会有’.’这个操作符号，这个操作符像是在往对象的内部不断地纵深。</p>
-<p>我们把每个关键字对应的值理解为一个对象，为了进入对象内部，用’.’来操作也就很理所当然了。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/利用新浪API实现数据抓取/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/01/利用新浪API实现数据抓取/" itemprop="url">利用新浪API实现数据抓取</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T18:37:42+08:00">
-                2018-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="利用新浪API实现数据的抓取-2018-4-16-更新"><a href="#利用新浪API实现数据的抓取-2018-4-16-更新" class="headerlink" title="利用新浪API实现数据的抓取(2018.4.16 更新)"></a><strong>利用新浪API实现数据的抓取(2018.4.16 更新)</strong></h1><font color="#FF0000" size="4" face="黑体"><br>2018.4.16 说明<br><br>注意：今天有人言语恶劣地评论我的博客是垃圾，说我的代码有问题，这篇博客历史久远，是我初玩爬虫写的博客。我非常感谢能对我的代码提出意见的人，但是出言不逊，态度恶劣的人我是忍受不了的，有话好好说，是一个现代社会高学历高知识分子的最低觉悟。<br><br>代码我已经改过了，如果还有问题非常欢迎大家来温和地指出！！！！<br><br>同时，由于新浪微博本身api机制的不断更改，到目前为止，这篇博客的内容已经有了局限，对于个人开发者来说，你申请到的token的权限只能爬你自己的微博，所以对于想要靠api来爬数据的人，恐怕可能并不能达成自己的目的了。想要用api来爬取微博内容只能选择获取更高的开发者权限了。<br><br></font>
-
-<hr>
-<h3 id="1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。"><a href="#1-首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。" class="headerlink" title="1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。　"></a><strong><em>1.　首先来看看最后我们得到的是什么结果，是不是你想要了解的东西，再决定是否往下读。</em></strong>　</h3><p><img src="http://111.230.251.140:8000/images/result.png" alt="注册新浪微博" title="结果"><br><br></p>
-<p>我主要抓取了大概4天的数据，图上可以看的出来大概有360万条数据，由于是在自己的电脑上爬取做数据的，有时候晚上断网了就间断了，所以大概一天可以爬取有100万左右的<strong>最新微博数据</strong>（因为我调用的是最新的微博API　<a href="http://open.weibo.com/wiki/2/statuses/public_timeline" target="_blank" rel="noopener">public_timeline</a>)</p>
-<p>API文档当中定义了很多返回的类型（以json数据格式返回，我选取了一些我认为重要的信息抓取下来<em>如图所示</em>:　大概有<strong>id号</strong>，<strong>所在位置</strong>，<strong>粉丝数</strong>，发的<strong>微博内容</strong>，发微博的<strong>时间</strong>等等。　当然这些数据都可以根据自己的需要进行定制。)</p>
-<h4 id="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦"><a href="#大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去…-第一次写博客有些啰嗦" class="headerlink" title="大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦"></a>大概就是这些内容，你如果认为这对你有点帮助，就请继续读下去… 第一次写博客有些啰嗦</h4><h3 id="2-前期准备"><a href="#2-前期准备" class="headerlink" title="2.　前期准备"></a><strong><em>2.　前期准备</em></strong></h3><p><strong>我们需要的东西：</strong></p>
-<ul>
-<li>数据库:　mongodb（可以使用客户端<a href="https://mongobooster.com/downloads" target="_blank" rel="noopener">MongoBooster</a>)</li>
-<li>开发环境：　Python2.7(我用的IDE是<a href="https://www.jetbrains.com/pycharm/" target="_blank" rel="noopener">Pycharm</a>)</li>
-<li>一个新浪开发者账号：　用自己的新浪微博账号注册就行（后面会讲）</li>
-<li>需要的库：　<a href="https://github.com/requests/requests" target="_blank" rel="noopener">requests</a>和pymongo(这些都可以在Pycharm中下载)</li>
-</ul>
-<h4 id="2-1-mongodb的安装"><a href="#2-1-mongodb的安装" class="headerlink" title="2.1　mongodb的安装"></a>2.1　mongodb的安装</h4><p>MongoDB是一个高性能，开源，无模式的文档型数据库，是当前NoSql数据库中比较热门的一种。它在许多场景下可用于替代传统的关系型数据库或键/值存储方式。Mongo使用C++开发。Mongo的官方网站地址是：<a href="http://www.mongodb.org/" target="_blank" rel="noopener">http://www.mongodb.org/</a>，读者可以在此获得更详细的信息。</p>
-<blockquote>
-<p>小插曲：什么是NoSql?</p>
-<p>　　NoSql，全称是 Not Only Sql,指的是非关系型的数据库。下一代数据库主要解决几个要点：非关系型的、分布式的、开源的、水平可扩展的。原始的目的是为了大规模web应用，这场运动开始于2009年初，通常特性应用如：模式自由、支持简易复制、简单的API、最终的一致性（非ACID）、大容量数据等。NoSQL被我们用得最多的当数key-value存储，当然还有其他的文档型的、列存储、图型数据库、xml数据库等。</p>
-</blockquote>
-<h4 id="网上有很多安装mongodb教程我就不写了"><a href="#网上有很多安装mongodb教程我就不写了" class="headerlink" title="网上有很多安装mongodb教程我就不写了"></a>网上有很多安装mongodb教程我就不写了</h4><p><a href="http://www.runoob.com/mongodb/mongodb-window-install.html" target="_blank" rel="noopener">Windows下mongodb的安装</a></p>
-<p><a href="http://www.runoob.com/mongodb/mongodb-linux-install.html" target="_blank" rel="noopener">Linux下mongodb的安装</a></p>
-<h4 id="2-2-新浪开发者账号的注册方法"><a href="#2-2-新浪开发者账号的注册方法" class="headerlink" title="2.2　新浪开发者账号的注册方法"></a>2.2　新浪开发者账号的注册方法</h4><ul>
-<li><strong>注册新浪微博账号（163邮箱、手机号）</strong></li>
-</ul>
-<p><img src="http://111.230.251.140:8000/images/sina1.png" alt="注册新浪微博" title="注册新浪微博"></p>
-<p>　　<strong> 创建完毕需要填写手机号验证 </strong><br><br></p>
-<ul>
-<li><strong>进入新浪开放者平台：<a href="http://open.weibo.com/" target="_blank" rel="noopener">http://open.weibo.com/</a></strong></li>
-</ul>
-<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
-<p><img src="http://111.230.251.140:8000/images/sina3.png" alt="sina"><br><br></p>
-<p><img src="http://111.230.251.140:8000/images/sina4.png" alt="sina"></p>
-<ul>
-<li><strong>点击继续创建</strong></li>
-</ul>
-<p>初次创建应用需要填写如下信息：</p>
-<p><img src="http://111.230.251.140:8000/images/sina5.png" alt="sina"></p>
-<p>此页面信息不需要填写真实信息，如地区，电话，可随意填写。网站填<a href="https://www.baidu.com/" target="_blank" rel="noopener">https://www.baidu.com/</a>即可。(邮箱要真实)</p>
-<p>继续创建应用。应用名称自定义，平台如下勾选 ios 、andrioid</p>
-<p><img src="http://111.230.251.140:8000/images/sina6.png" alt="sina"></p>
-<p>创建完毕直接返回继续创建，一个账号可以创建10个应用，每个应用对应一个access-token(事实上我只用了一个就可以满足需求)</p>
-<ul>
-<li><strong>前往<a href="http://open.weibo.com/tools/console" target="_blank" rel="noopener">API测试平台</a></strong></li>
-</ul>
-<p><img src="http://111.230.251.140:8000/images/sina7.png" alt="sina"><br><br></p>
-<p><img src="http://111.230.251.140:8000/images/sina8.png" alt="sina"><br><br></p>
-<p>依次选取创建的应用。点<img src="http://111.230.251.140:8000/images/sina9.png" alt="sina">将下方的token用txt保存即可。</p>
-<ul>
-<li><strong>获取key</strong></li>
-</ul>
-<p>回到</p>
-<p><img src="http://111.230.251.140:8000/images/sina2.png" alt="sina"><br><br></p>
-<p>点击<strong>我的应用</strong></p>
-<p>然后选择自己刚刚创建的应用</p>
-<p><img src="http://111.230.251.140:8000/images/sina10.png" alt="sina"></p>
-<p>进入之后点击<strong>应用信息</strong></p>
-<p><img src="http://111.230.251.140:8000/images/sina11.png" alt="sina"></p>
-<p>保存下　<strong>APP Key</strong> 和　<strong>APP Secret</strong></p>
-<p>点击<strong>高级信息</strong></p>
-<p>设置回调网址</p>
-<p><img src="http://111.230.251.140:8000/images/sina12.png" alt="sina"></p>
-<p>可以设置成默认的<br><a href="http://api.weibo.com/oauth2/default.html" target="_blank" rel="noopener">http://api.weibo.com/oauth2/default.html</a></p>
-<p>至此你的开发者账号就已经完成了</p>
-<h4 id="2-3-依赖库的安装方法"><a href="#2-3-依赖库的安装方法" class="headerlink" title="2.3　依赖库的安装方法"></a>2.3　依赖库的安装方法</h4><p><a href="https://github.com/requests/requests" target="_blank" rel="noopener">requests</a>和pymongo的安装</p>
-<p>可以直接用pip安装<br><strong>pip install requests</strong>　和　<strong>pip install pymongo</strong></p>
-<p>也可以在Pycharm里面直接安装</p>
-<p>选择File -&gt; Settings -&gt; Project -&gt; Project Interpreter</p>
-<p>可以看到自己安装的Python库，点击右边的绿色<strong>　＋　</strong> 号</p>
-<p>安装即可</p>
-<h3 id="3-分析问题"><a href="#3-分析问题" class="headerlink" title="3.　分析问题　"></a><strong><em>3.　分析问题</em></strong>　</h3><h4 id="3-1-OAuth-认证"><a href="#3-1-OAuth-认证" class="headerlink" title="3.1 OAuth 认证"></a><strong>3.1 OAuth 认证</strong></h4><p><strong> 授权机制说明（很重要）</strong></p>
-<p>网上很多讲利用新浪微博API发送微博什么的都是使用的<strong>请求用户授权Token</strong>这种方式，但是这种方式显然不适用于我们爬取数据，因为每次都要请求，每次都要重新获取code。具体可参考<a href="http://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6%E8%AF%B4%E6%98%8E" target="_blank" rel="noopener">新浪微博API的授权机制</a></p>
-<p>廖雪峰老师(sinaweibopy 的贡献者）也对这个授权机制有一个说明</p>
-<blockquote>
-<p>通过新浪微博的API接入网站，由于用户无需在您的网站上注册，就可以直接?使用他／她在新浪微博的帐号和口令登录您的网站，这就需要确保您的网站在无需知道，也不能知道用户口令的情况下确认用户已经登录成功。由于用户的口令存储在新浪微博，因此，认证用户的过程只能由新浪微博完成，但新浪微博如何与您的网站通信并告知您用户是否登录成功呢？这个过程称之为第三方登录，OAuth是一个标准的第三方登录协议，借助OAuth，您的网站就可以安全地接入来自新浪微博登录成功的用户。</p>
-<p>OAuth目前主要有1.0和2.0两个版本，2.0版对1.0版做了大量简化，API也更简单。新浪微博最新的API也是采用的OAuth 2.0，整个登录流程如下：</p>
-<ol>
-<li>用户在您的网站上点击“使用新浪微博登录”，您的网站将用户重定向到新浪微博的OAuth认证页，重定向链接中包含client_id参数作为您的网站ID，redirect_uri参数告诉新浪微博当用户登录成功后，将浏览器重定向到您的网站；</li>
-<li>用户在新浪微博的认证页输入帐号和口令；</li>
-<li>新浪微博认证成功后，将浏览器重定向到您的网站，并附上code参数；</li>
-<li>您的网站通过code参数向新浪微博请求用户的access token；</li>
-<li>您的网站拿到用户的access token后，用户登录完成。<br>OAuth的access token是提供认证服务的网站（例如新浪微博）生成的令牌，代表一个用户认证信息。在随后的API调用中，传入该access token就代表这个登录用户，这样，通过OAuth协议，您的网站将验证用户的步骤交给新浪微博完成，并由新浪微博告知您用户是否登录成功。</li>
-</ol>
-<p>OAuth的安全性是通过步骤4完成的，通过code参数获取access token的过程是您的网站后台到新浪微博网站完成的，用户无法看到获取access token的HTTP请求。如果用户传入伪造的code，则新浪微博会返回一个错误。</p>
-</blockquote>
-<p>具体内容请看<a href="http://www.liaoxuefeng.com/article/00137389308005720bf24cb6cf14d9e897e7026dbc6a842000" target="_blank" rel="noopener">廖雪峰老师的文档</a></p>
-<p>大致上来说按照一般的请求用户授权Token调用会出现这种情况：</p>
-<p><img src="http://111.230.251.140:8000/images/sina14.png" alt="登录微博" title="登录微博"><br><br></p>
-<p>获取code<br><img src="http://111.230.251.140:8000/images/sina13.png" alt="获取code"></p>
-<p>登陆后会调转到一个连接<a href="https://api.weibo.com/oauth2/default.html?code=××××××××" target="_blank" rel="noopener">https://api.weibo.com/oauth2/default.html?code=××××××××</a>　</p>
-<p>我们所需要的就是code=××××××××××　的值</p>
-<h4 id="也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站"><a href="#也就是说，每当你调用一次API认证在浏览器中都会出现一个code-这样显然不利于我们去爬取网站" class="headerlink" title="也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站　"></a><strong>也就是说，每当你调用一次API认证在浏览器中都会出现一个code,这样显然不利于我们去爬取网站</strong>　</h4><p>怎么解决问题呢？首先我们想到的自然是在Python程序里面模拟登录新浪微博，然后自然可以获取到code的值，但是，模拟新浪微博登录相对来说比较复杂，而且既然都模拟登录成功了，为啥还要调用API呢…直接自定义进行抓取不是更加方便。</p>
-<p><strong>如果看了上面的那个授权机制，就应该想到。这个时候就需要我们之前申请的access-token了</strong></p>
-<p>access-token 根据我的理解就是把你的微博授权给了第三方让他帮你做一些事情，类似于在你的手机端通过新浪微博来登录然后进行操作(利用上面授权机制里面讲的一句话来说就是)<em>移动端应用可直接使用官方移动SDK，通过呼起微博客户端（未安装微博客户端的会呼起H5授权页）方式授权</em></p>
-<p>这个界面你应该很熟悉</p>
-<p><img src="http://111.230.251.140:8000/images/sina15.png" alt="新浪授权"></p>
-<p>新浪也给出了说明<a href="http://open.weibo.com/wiki/Oauth2/access_token" target="_blank" rel="noopener">Oauth2/access token</a></p>
-<h3 id="４-代码实现"><a href="#４-代码实现" class="headerlink" title="４.　代码实现　"></a><strong><em>４.　代码实现</em></strong>　</h3><p>有了token之后，实现抓取数据就十分简单了<br>能抓取数据的多少就取决于你的token权限了</p>
-<p>接下来就是利用API来获取数据了：新建一个文件weibo_run.py</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> pymongo <span class="keyword">import</span> MongoClient</span><br><span class="line"></span><br><span class="line">ACCESS_TOKEN = <span class="string">'2.00ZooSqFHAgn3D59864ee3170DLjNj'</span></span><br><span class="line">URL = <span class="string">'https://api.weibo.com/2/statuses/public_timeline.json'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">()</span>:</span></span><br><span class="line"><span class="comment">#授权</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        <span class="comment">#调用statuses__public_timeline的api接口</span></span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">'access_token'</span>: ACCESS_TOKEN</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        statuses = requests.get(url=URL, params=params).json()[<span class="string">'statuses'</span>]</span><br><span class="line">        length = len(statuses)</span><br><span class="line">        <span class="comment">#这是后来我为了查看获取微博条数设置的</span></span><br><span class="line">        <span class="keyword">print</span> length</span><br><span class="line"></span><br><span class="line">        <span class="comment">#连接mongodb,不需要本地的额外配置</span></span><br><span class="line">        Monclient = MongoClient(<span class="string">'localhost'</span>, <span class="number">27017</span>)</span><br><span class="line">        db = Monclient[<span class="string">'Weibo'</span>]</span><br><span class="line">        WeiboData = db[<span class="string">'HadSelected'</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment">#获取的各个数据名应该可以清楚的看出来对应的是什么数据</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, length):</span><br><span class="line">            created_at = statuses[i][<span class="string">'created_at'</span>]</span><br><span class="line">            id = statuses[i][<span class="string">'user'</span>][<span class="string">'id'</span>]</span><br><span class="line">            province = statuses[i][<span class="string">'user'</span>][<span class="string">'province'</span>]</span><br><span class="line">            city = statuses[i][<span class="string">'user'</span>][<span class="string">'city'</span>]</span><br><span class="line">            followers_count = statuses[i][<span class="string">'user'</span>][<span class="string">'followers_count'</span>]</span><br><span class="line">            friends_count = statuses[i][<span class="string">'user'</span>][<span class="string">'friends_count'</span>]</span><br><span class="line">            statuses_count = statuses[i][<span class="string">'user'</span>][<span class="string">'statuses_count'</span>]</span><br><span class="line">            url = statuses[i][<span class="string">'user'</span>][<span class="string">'url'</span>]</span><br><span class="line">            geo = statuses[i][<span class="string">'geo'</span>]</span><br><span class="line">            comments_count = statuses[i][<span class="string">'comments_count'</span>]</span><br><span class="line">            reposts_count = statuses[i][<span class="string">'reposts_count'</span>]</span><br><span class="line">            nickname = statuses[i][<span class="string">'user'</span>][<span class="string">'screen_name'</span>]</span><br><span class="line">            desc = statuses[i][<span class="string">'user'</span>][<span class="string">'description'</span>]</span><br><span class="line">            location = statuses[i][<span class="string">'user'</span>][<span class="string">'location'</span>]</span><br><span class="line">            text = statuses[i][<span class="string">'text'</span>]</span><br><span class="line"></span><br><span class="line">            <span class="comment">#插入mongodb</span></span><br><span class="line">            WeiboData.insert_one(&#123;</span><br><span class="line">                <span class="string">'created_at'</span>: created_at,</span><br><span class="line">                <span class="string">'id'</span>: id,</span><br><span class="line">                <span class="string">'nickname'</span>: nickname,</span><br><span class="line">                <span class="string">'text'</span>: text,</span><br><span class="line">                <span class="string">'province'</span>: province,</span><br><span class="line">                <span class="string">'location'</span>: location,</span><br><span class="line">                <span class="string">'description'</span>: desc,</span><br><span class="line">                <span class="string">'city'</span>: city,</span><br><span class="line">                <span class="string">'followers_count'</span>: followers_count,</span><br><span class="line">                <span class="string">'friends_count'</span>: friends_count,</span><br><span class="line">                <span class="string">'statuses_count'</span>: statuses_count,</span><br><span class="line">                <span class="string">'url'</span>: url,</span><br><span class="line">                <span class="string">'geo'</span>: geo,</span><br><span class="line">                <span class="string">'comments_count'</span>: comments_count,</span><br><span class="line">                <span class="string">'reposts_count'</span>: reposts_count</span><br><span class="line">                &#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    run()</span><br></pre></td></tr></table></figure>
-<p>刚开始我的代码是这样的，看起来已经完成了。</p>
-<p>但是，因为新浪会限制你的调用次数，后来我试了一下重新运行,结果发现了一个问题，我之前的<em>print length</em> 出来的每行获取值都不一样，总是在１６－２０之间徘徊，<strong>这说明了我每次重新运行获取的数据都不一样</strong>.然后我想算了，干脆写个<strong>死循环</strong>看他什么时候再被封吧。于是代码就变成了下面这样</p>
-<p>把<del>run()</del>删除，换成下面这个死循环。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line">      　<span class="keyword">try</span>:</span><br><span class="line">          　run()</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
-<p>结果他就一直运行下去了…运行了四天还没有被封，估计是封不了了…</p>
-<p>其他接口也是一样使用，只用改变url和params就行，具体参数参照<a href="http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI" target="_blank" rel="noopener">新浪微博API文档</a></p>
-<p>开始我发现一天可以获取800万的数据，把我给乐的…后来发现好多好多重复的数据。最后找了半天的解决方案，在mongodb中根据用户的id和创建的时间这两点建立索引(因为一个人不可能在同一时刻发送两条微博),最后没有重复数据大概一天可以获取100万条左右的信息。</p>
-<h3 id="个人博客"><a href="#个人博客" class="headerlink" title="个人博客"></a>个人博客</h3><p>8aoy1.cn</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/03/python爬取图片/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/03/python爬取图片/" itemprop="url">python爬取图片</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-03T10:05:39+08:00">
-                2018-02-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
-                    <span itemprop="name">Web spiders</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近在做机器学习下的人脸识别的学习，机器学习这个东西有点暴力，很大程度上靠训练的数据量来决定效果。为了找数据，通过一个<a href="http://blog.csdn.net/chenriwei2/article/details/50631212" target="_blank" rel="noopener">博客</a>的指导，浏览了几个很知名的数据集。</p>
-<p>几个大型数据集是通过发邮件申请进行下载，几个小型数据集直接在网页的链接下载，还有一个<a href="http://www.cs.columbia.edu/CAVE/databases/pubfig/" target="_blank" rel="noopener">Pubfig</a>数据集则是提供了大量图片的链接来让我们自己写程序来下载。</p>
-<p>权衡了数据量的需求，最后选择Pubfig的数据集，于是就自己写了一个python图片采集程序，里面用了urllib和requests两种方法.</p>
-<h2 id="分析Pubfig提供的下载文件的特点"><a href="#分析Pubfig提供的下载文件的特点" class="headerlink" title="分析Pubfig提供的下载文件的特点"></a>分析<a href="http://www.cs.columbia.edu/CAVE/databases/pubfig/" target="_blank" rel="noopener">Pubfig</a>提供的下载文件的特点</h2><p><img src="/2018/02/03/python爬取图片/people.png" alt="people"><br>这个数据文件提供了在数据集中出现的所有人物<br><img src="/2018/02/03/python爬取图片/urls.png" alt="urls"><br>这个数据文件提供了每个人的urls</p>
-<p>可以看出来这个数据集的处理其实非常简单了，可以通过readlines的方式存进列表用空格分开一下数据就可以把urls提取出来了。</p>
-<h2 id="处理一下urls文件"><a href="#处理一下urls文件" class="headerlink" title="处理一下urls文件"></a>处理一下urls文件</h2><p>urls在文件的中后部，写个文件把它单纯地提取出来，方便使用。<br>我单独把Miley_Cyrus的部分提取出来放了一个txt文件</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">pic_url = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./Miley_Cyrus.txt'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        pic_url.append(i.strip(<span class="string">'\r\n'</span>))</span><br><span class="line"></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> pic_url:</span><br><span class="line">    _, _, _, url, _, _ = s.split()</span><br><span class="line">    urls.append(url)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写入到文件里面</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'url.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> urls:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="爬取urls图片"><a href="#爬取urls图片" class="headerlink" title="爬取urls图片"></a>爬取urls图片</h2><h3 id="1-Urllibs方法"><a href="#1-Urllibs方法" class="headerlink" title="1. Urllibs方法"></a>1. Urllibs方法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib.request <span class="keyword">as</span> request</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在同级目录新建文件夹存图片</span></span><br><span class="line">os.mkdir(<span class="string">'./img'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为请求增加一下头</span></span><br><span class="line">user_agent = <span class="string">'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'</span></span><br><span class="line">headers = (<span class="string">'User-Agent'</span>, user_agent)</span><br><span class="line">opener = request.build_opener()</span><br><span class="line">opener.addheaders = [headers]</span><br><span class="line">request.install_opener(opener)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设定一下无响应时间，防止有的坏图片长时间没办法下载下来</span></span><br><span class="line">timeout = <span class="number">20</span></span><br><span class="line">socket.setdefaulttimeout(timeout)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从文件里面读urls</span></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./url.data'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        <span class="keyword">if</span> i != <span class="string">''</span>:</span><br><span class="line">            urls.append(i)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过urllibs的requests获取所有的图片</span></span><br><span class="line">count = <span class="number">1</span></span><br><span class="line">bad_url = []</span><br><span class="line"><span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">    url.rstrip(<span class="string">'\n'</span>)</span><br><span class="line">    print(url)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pic = request.urlretrieve(url, <span class="string">'./img3/%d.jpg'</span> % count)</span><br><span class="line">        print(<span class="string">'pic %d'</span> % count)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        print(Exception, <span class="string">':'</span>, e)</span><br><span class="line">        bad_url.append(url)</span><br><span class="line">    print(<span class="string">'\n'</span>)</span><br><span class="line">print(<span class="string">'got all photos that can be got'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把没有抓取到的urls保存起来</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'bad_url3.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> bad_url:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br><span class="line">    print(<span class="string">'saved bad urls'</span>)</span><br></pre></td></tr></table></figure>
-<h3 id="2-Requests方法"><a href="#2-Requests方法" class="headerlink" title="2. Requests方法"></a>2. Requests方法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在同级目录新建文件夹存图片</span></span><br><span class="line">os.mkdir(<span class="string">'./img'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设定一下无响应时间，防止有的坏图片长时间没办法下载下来</span></span><br><span class="line">timeout = <span class="number">20</span></span><br><span class="line">socket.setdefaulttimeout(timeout)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从文件里面读urls</span></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./url.data'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        <span class="keyword">if</span> i != <span class="string">''</span>:</span><br><span class="line">            urls.append(i)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为请求增加一下头，获取图片</span></span><br><span class="line">user_agent = <span class="string">'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'</span></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: user_agent</span><br><span class="line">&#125;</span><br><span class="line">bad_url = []</span><br><span class="line">count = <span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">    url.rstrip(<span class="string">'\n'</span>)</span><br><span class="line">    print(url)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pic = requests.get(url, headers=headers)</span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">'./img2/%d.jpg'</span> % count, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(pic.content)</span><br><span class="line">            f.flush()</span><br><span class="line">        print(<span class="string">'pic %d'</span> % count)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        print(Exception, <span class="string">':'</span>, e)</span><br><span class="line">        bad_url.append(url)</span><br><span class="line">    print(<span class="string">'\n'</span>)</span><br><span class="line">print(<span class="string">'got all photos that can be got'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存坏链接</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'bad_url.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> bad_url:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br><span class="line">    print(<span class="string">'saved bad urls'</span>)</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/18/解决CMAKE编译第三方开源软件需要下载的问题/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/18/解决CMAKE编译第三方开源软件需要下载的问题/" itemprop="url">解决CMAKE编译第三方开源软件需要下载的问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-18T17:40:30+08:00">
-                2018-01-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/编译开源软件/" itemprop="url" rel="index">
-                    <span itemprop="name">编译开源软件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
-<h1 id="解决CMAKE编译第三方开源软件需要下载的问题"><a href="#解决CMAKE编译第三方开源软件需要下载的问题" class="headerlink" title="解决CMAKE编译第三方开源软件需要下载的问题"></a>解决CMAKE编译第三方开源软件需要下载的问题</h1><p>经常会出现这种问题：我们从github上面下载了一些开源软件，但是这个开源软件<strong>本身其实是会下载很多其他开源软件</strong>，编译后作为软件的一部分。<br>看起来好像没什么问题，但是有时候这个下载很耗时间，让整个安装变得很慢，它本身的这个下载过程下载东西真的很不稳定。所以就导致了有可能的安装失败。重新多次安装又要多次下载，这个过程真的很浪费时间和网络资源硬盘资源。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过对于我最近使用的一个软件的cmake过程的研究，发现这个软件安装时进行第三方的包的下载的时候，是通过CMAKE自带的下载和编译功能进行的。所以为了：</p>
-<ul>
-<li>能够让下载第三方源码的过程被消除</li>
-<li>同时为了保证不发生因为下载慢，导致的第三方的开源软件的编译的<strong>进程竞争</strong>，进而导致安装时的开源软件之间的互相依赖或者make文件不存在问题。</li>
-</ul>
-<h3 id="–采用网上对于CMAKE过程的修改方法"><a href="#–采用网上对于CMAKE过程的修改方法" class="headerlink" title="–采用网上对于CMAKE过程的修改方法"></a>–采用网上对于CMAKE过程的修改方法</h3><ol>
-<li><p>将.cmake 文件中的以下代码<br> #–Download step————–<br> DOWNLOAD_DIR      ${SB_DOWNLOAD_DIR}<br> URL  <a href="https://github.com/gflags/gflags/archive/v2.1.2.zip" target="_blank" rel="noopener">https://github.com/gflags/gflags/archive/v2.1.2.zip</a><br> URL_MD5           5cb0a1b38740ed596edb7f86cd5b3bd8<br> 部分更改为<br> #–Download step————–<br> DOWNLOAD_COMMAND “”</p>
-</li>
-<li><p>同时，将src（这个文件是原本解压下载的第三方源码source的地方，具体名称要看CMakeLists.txt中SOURCE_DIR的设置）中的各个第三方源码都解压好，放到src对应的文件夹中。</p>
-</li>
-</ol>
-<p>结果：<strong>这样整个程序编译第三方开源软件的编译过程就可以直接调用src目录中我们早就自己下载好的源码进行安装了</strong></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/14/using-Electron-to-create-app-with-Js-html-css/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/14/using-Electron-to-create-app-with-Js-html-css/" itemprop="url">using Electron to create app with Js&html&css</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-14T11:06:32+08:00">
-                2018-01-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/App/" itemprop="url" rel="index">
-                    <span itemprop="name">App</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="notes-of-Electron-Api-Demo"><a href="#notes-of-Electron-Api-Demo" class="headerlink" title="notes of Electron Api Demo"></a>notes of Electron Api Demo</h1><hr>
-<p><img src="/2018/01/14/using-Electron-to-create-app-with-Js-html-css/ui-terminology.png" alt="section&amp;category"></p>
-<h2 id="1-add-a-new-section-to-program"><a href="#1-add-a-new-section-to-program" class="headerlink" title="1. add a new section to program"></a>1. add a new section to program</h2><p>A <strong>category</strong> is consist of several sections, and the section is a part that contains a individual page  </p>
-<p>To create a new <strong>section</strong> in code, add following code in <code>index.html</code></p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">id</span>=<span class="string">"xxx2"</span> <span class="attr">data-section</span>=<span class="string">"xxx2"</span> <span class="attr">class</span>=<span class="string">"nav-button"</span>&gt;</span>Use system <span class="tag">&lt;<span class="name">em</span>&gt;</span>dialogs<span class="tag">&lt;/<span class="name">em</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>in this pice of code, the real important element is <code>(1)data-section=&quot; &quot;</code> and <code>(2)class=&quot; &quot;</code></p>
-<ul>
-<li><p><code>(1)data-section=&quot; &quot;</code> is relevant to template file to the file of the import links in the <code>head</code> of <code>index.html</code>. for example:</p>
-  <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"import"</span> <span class="attr">href</span>=<span class="string">"sections/native-ui/dialogs.html"</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>  the file name is of no use in fact(you can choose no matter what), but it can tell what the file’s content is. The real thing makes the Electron knows what to render is this <code>data-section=&quot;xxx2&quot;</code> in <code>index.html</code>  and the <code>id=&quot;xxx2-section&quot;</code> in template file’s <code>&lt;section&gt;</code> tag.<br>  when you make <code>xxx2</code> the same in two files, then the Electron can render the correct html for <strong>section</strong></p>
-</li>
-<li><code>(2)class=&quot; &quot;</code> is about the style of the <strong>section</strong> looking like. In css file, it will all be defined.</li>
-</ul>
-<h2 id="2-add-a-demo"><a href="#2-add-a-demo" class="headerlink" title="2.add a demo"></a>2.add a demo</h2><p>We can just copy a demo code of <code>&lt;div class=&quot;demo&quot;&gt;</code> and paste to get a new <strong>demo</strong>, but the process of this <strong>demo</strong> must contain new JS action code different from the <strong>old demo</strong>.Or the new demo will just can be clicked but do nothing.  </p>
-<p>We can find that when the <strong>section</strong> code be imported by the head lines in <code>index.html</code>, the JS code used in the section code also is imported together.So the same JS code will just be imported once and just for  <strong>the first section</strong></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/04/2018年使用ipv6-XX-net翻墙/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/04/2018年使用ipv6-XX-net翻墙/" itemprop="url">2018年使用ipv6 XX-net翻墙</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-04T15:52:00+08:00">
-                2018-01-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web/" itemprop="url" rel="index">
-                    <span itemprop="name">Web</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="2018年ubuntu使用XXnet"><a href="#2018年ubuntu使用XXnet" class="headerlink" title="#2018年ubuntu使用XXnet  "></a>#2018年ubuntu使用XXnet  </h2><p><em>从大概两个月前开始，xx-net开始不好用了，几乎所有的ipv4的ip都被封锁了没有办法上网，所以很长一段时间我告别了它，openvpn成了我的最后的伙伴（很多其他的手机vpn软件也开始失效了)</em><br><em>但是今天我终于通过使用ipv6借助xx-net又能翻出围墙了</em></p>
-<h2 id="1、准备工作"><a href="#1、准备工作" class="headerlink" title="1、准备工作"></a>1、准备工作</h2><ol>
-<li>下载最新版的<a href="https://github.com/XX-net/XX-Net/blob/master/code/default/download.md" target="_blank" rel="noopener">xx-net</a>  </li>
-<li>在ubuntu下安装miredo， miredo提供一种 IPv6/IPv4转换技术，它让只能访问ipv4的网络用户能够体验到ipv6的网络。当然如果你的网络运营商已经提供了ipv6服务那你就大可不必装这个软件了。（<a href="http://test-ipv6.com/" target="_blank" rel="noopener">查看是否支持ipv6</a>）</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装miredo</span><br><span class="line">sudo apt install miredo </span><br><span class="line"><span class="meta">#</span> 并且启动miredo，默认不是开机启动项，所以每次重新开机以后都要重新启动</span><br><span class="line">sudo service miredo start</span><br></pre></td></tr></table></figure>
-<h2 id="2、进行安装"><a href="#2、进行安装" class="headerlink" title="2、进行安装"></a>2、进行安装</h2><ol>
-<li>安装xx-net，这个大家应该都比较熟，首先解压安装包<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 解压</span><br><span class="line">sudo unzip XX-Net-3.8.7.zip</span><br><span class="line"><span class="meta">#</span> 移动xx-net到/opt/目录，这个目录是我比较喜欢的软件安装目录，一般deb包安装的软件也都是安装在这个目录下面</span><br><span class="line">sudo mv XX-Net-3.8.7 /opt/</span><br><span class="line"><span class="meta">#</span> 开始运行</span><br><span class="line">sudo /opt/XX-Net-3.8.7/start</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="3、进入localhost-8085管理界面"><a href="#3、进入localhost-8085管理界面" class="headerlink" title="3、进入localhost:8085管理界面"></a>3、进入localhost:8085管理界面</h2><p>经过以上的步骤，我们已经开启了xx-net 以及 miredo服务,在浏览器中访问xx-net 的管理界面，我们现在应该能够看到一些内容<br><img src="/2018/01/04/2018年使用ipv6-XX-net翻墙/xx_net.png" alt="图片1">:</p>
-<h2 id="4、注意事项"><a href="#4、注意事项" class="headerlink" title="4、注意事项"></a>4、注意事项</h2><ol>
-<li>教育网没有办法使用miredo</li>
-<li>重启电脑后联网后，需要使用启动miredo<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo miredo</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/22/爬取携程和蚂蜂窝的景点评论数据/" itemprop="url">爬取携程和蚂蜂窝的景点评论数据</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:27:58+08:00">
-                2017-12-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
-                    <span itemprop="name">Web spiders</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;为了获取多源数据需要到各个网站获取一些景点的评论信息和图片，首先选到了携程和蚂蜂窝这两个网站，将一些爬取过程记录下来</p>
-<h2 id="携程"><a href="#携程" class="headerlink" title="携程"></a>携程</h2><h3 id="分析数据"><a href="#分析数据" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;首先我们去携程的<a href="http://you.ctrip.com/sight/gulangyu120058.html" target="_blank" rel="noopener">鼓浪屿景点速览</a>看一下我们要爬取的页面，大概发现有几十个景点，每个景点的结构应该都是差不多的，所以我们选择<a href="http://you.ctrip.com/sight/gulangyu120058/57405.html" target="_blank" rel="noopener">第一个景点</a>进去看看具体的页面应该怎么爬取。</p>
-<p><img src="http://111.230.251.140:8000/images/ctrip_gulangyu.jpg" alt="鼓浪屿评论分析" title="结果"></p>
-<p>我们需要的是红圈的部分，很容易可以知道这个评论页面是动态加载的，所以不能直接用bs4或者正则直接提取元素，我们需要分析一下页面动态传输的接口。打开chrome审查元素,切换到network查看一下传输的内容，首先清空内容避免干扰，然后点击下一页，我们可以得到</p>
-<p><img src="http://111.230.251.140:8000/images/gulangyu_check.jpg" alt="鼓浪屿审查元素" title="结果"></p>
-<p>通过查看传回的数据我们可以得到这就是我们所要的接口，使用的是post进行传输，传输的Form Data 有很多字段，大致可以猜测出来</p>
-<blockquote>
-<p>poiID 是景点的poiID <br> pagenow 是当前的页数 <br> star 是评分1-5，0代表全部 <br> resourceId 是一个每个资源对应的值</p>
-</blockquote>
-<p>爬取的时候只需要改变这些值就可以根据自己的需求爬取内容了，但是需要注意的事携程的pagenow最多只能获取100页，而且poiID和resourceId的值是没有规律的，需要我们逐个景点查看…我自己依次找了鼓浪屿所有景点的值，并存在文本中，文末有github的共享。</p>
-<h3 id="建库"><a href="#建库" class="headerlink" title="建库"></a>建库</h3><p>&emsp;&emsp;我们要做的第一件事就是想好数据库的结构,我选择的还是使用mysql，具体的结构如下：</p>
-<p><img src="http://111.230.251.140:8000/images/ctrip_mysql.jpg" alt="携程建库" title="结果"></p>
-<h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><p>&emsp;&emsp;这个我就不具体分析了，也不难，就是有几个坑要注意一下。</p>
-<blockquote>
-<p>第一，不是所有评论都有景色，性价比之类的评分，所以这里要加一个判断。<br> 第二，原来是有出行时间这一项的，现在好像没有了额。<br> 第三，评论文本可能会出现单引号，插入数据库会出现错误，要转义或者替代一下。<br> 第四，抓取速度不要太快，携程反扒还是比较厉害的。</p>
-</blockquote>
-<h2 id="蚂蜂窝"><a href="#蚂蜂窝" class="headerlink" title="蚂蜂窝"></a>蚂蜂窝</h2><h3 id="分析数据-1"><a href="#分析数据-1" class="headerlink" title="分析数据"></a>分析数据</h3><p>&emsp;&emsp;同样，蚂蜂窝的数据也是动态加载的，用相同的方法查看分析数据接口。</p>
-<p><img src="http://111.230.251.140:8000/images/mafengwo_detail.jpg" alt="蚂蜂窝" title="结果"></p>
-<p>可以看到蚂蜂窝的数据获取方式是get，我们可以找出请求的url的规律。经过比较不同景点和不同页面的数据，我们发现参数的改变主要在两个地方，一个是poiid我用href代替，一个是页数我用num代替。获取景点的评论数据只要改变这两个值就可以了</p>
-<blockquote>
-<p>url=’<a href="http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D" target="_blank" rel="noopener">http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=jQuery18105332634542482972_1511924148475&amp;params=%7B%22poi_id%22%3A%22{href}%22%2C%22page%22%3A{num}%2C%22just_comment%22%3A1%7D</a>‘</p>
-</blockquote>
-<h3 id="获取每个景点的poi"><a href="#获取每个景点的poi" class="headerlink" title="获取每个景点的poi"></a>获取每个景点的poi</h3><p>这个不是post请求我们就不必一个个景点去获取参数了，我们可以访问<a href="http://www.mafengwo.cn/jd/12522/gonglve.html" target="_blank" rel="noopener">这个站点</a>来发现所有的用户，然而这个站点的数据也是动态加载的</p>
-<p><img src="http://111.230.251.140:8000/images/mafengwo_all_scenery.jpg" alt="蚂蜂窝" title="结果"></p>
-<p><img src="http://111.230.251.140:8000/images/mafengwo_router_header.jpg" alt="蚂蜂窝" title="结果"></p>
-<p><img src="http://111.230.251.140:8000/images/mafengwo_router_preview.jpg" alt="蚂蜂窝" title="结果"></p>
-<p>根据上面的图片我们可以清晰的看到我们只需要传入页码数就可以得到所有的景点的poiid,然后根据这些poiid我们就可以得到所有的评论数据，这一部分我们用一个函数来处理</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_param</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 获取所有景点的参数</span></span><br><span class="line">    total = []</span><br><span class="line">    router_url = <span class="string">'http://www.mafengwo.cn/ajax/router.php'</span></span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">6</span>):</span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">'sAct'</span>: <span class="string">'KMdd_StructWebAjax|GetPoisByTag'</span>,</span><br><span class="line">            <span class="string">'iMddid'</span>: <span class="number">12522</span>,</span><br><span class="line">            <span class="string">'iTagId'</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="string">'iPage'</span>: num</span><br><span class="line">        &#125;</span><br><span class="line">        pos = requests.post(url=router_url, data=params, headers=headers).json()</span><br><span class="line">        soup_pos = BeautifulSoup(pos[<span class="string">'data'</span>][<span class="string">'list'</span>], <span class="string">'lxml'</span>)</span><br><span class="line"></span><br><span class="line">        result = [&#123;<span class="string">'scenery'</span>: p[<span class="string">'title'</span>], <span class="string">'href'</span>: re.findall(re.compile(<span class="string">r'/poi/(\d+).html'</span>), p[<span class="string">'href'</span>])[<span class="number">0</span>]&#125; <span class="keyword">for</span> p <span class="keyword">in</span></span><br><span class="line">                  soup_pos.find_all(<span class="string">'a'</span>)]</span><br><span class="line">        total.extend(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> total</span><br></pre></td></tr></table></figure>
-<p>&emsp;&emsp;其余部分相似，不再过多说明。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/爬取微博图片数据存到Mysql中遇到的各种坑/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/22/爬取微博图片数据存到Mysql中遇到的各种坑/" itemprop="url">爬取微博图片数据存到Mysql中遇到的各种坑</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:26:42+08:00">
-                2017-12-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
-                    <span itemprop="name">Web spiders</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;由于硬件等各种原因需要把大概170多万2t左右的微博图片数据存到Mysql中.之前存微博数据一直用的非关系型数据库mongodb，由于对Mysql的各种不熟悉，踩了无数坑，来来回回改了3天才完成。</p>
-<h2 id="挖坑填坑之旅"><a href="#挖坑填坑之旅" class="headerlink" title="挖坑填坑之旅"></a>挖坑填坑之旅</h2><h3 id="建表"><a href="#建表" class="headerlink" title="建表"></a><strong>建表</strong></h3><p>存数据的时候首先需要设计数据库,我准备设计了3个表</p>
-<p>微博表：[id, userid, blog_text, lat, lng, created_time, reserve]&emsp;&emsp; <strong>pkey: id</strong></p>
-<p>图片表：[md5, pic_url, pic_bin, exif, reserve]&emsp;&emsp; <strong>pkey: md5</strong></p>
-<p>关系表：[id, md5, reserve]&emsp;&emsp; <strong>pkey: (id, md5) &emsp; fkey: (id, 微博表id)&emsp; (md5, 图片表md5)</strong></p>
-<p>&emsp;&emsp;建表的时候别的问题都还好，主要是 pic_bin 的类型和 blog_text 的类型有很大的问题，首先是pic_bin的类型，开始设置的为<strong>BLOB</strong>，但是运行之后发现BLOB最大只能存1M的数据，并不能满足微博图片的存储，后改成<strong>MEDIUMBLOB</strong>(16M)基本能够满足要求了。再后来就是blog_text，我遇到的第一个大坑</p>
-<p>&emsp;&emsp;开始的时候很自然的设置blog_text的类型为TEXT，但跑起来发现有些数据存不进去，会报错，经筛查发现是有些微博文本中包含了emoji表情…随后找了很多资料发现是因为utf8下文字是三字节，但是emoji是四字节，需要将编码改成utf8mb4。然而我在mac上整mysql的配置文件报各种奇葩错误,一怒之下把<strong>TEXT</strong>改成了<strong>BLOB</strong>，就好了。因为本地是MAC，我要连接到远程的一台Windows上才能通过那个Windows连接到群晖的Mysql上…本地配置改了也白改。</p>
-<h3 id="存图片"><a href="#存图片" class="headerlink" title="存图片"></a><strong>存图片</strong></h3><p>&emsp;&emsp;然后这就是一个<strong><em>大坑！！！</em></strong> 由于我使用的python3，所以读取图片得到的二进制的结果前面会有一个b’, 表示bytes，正是由于这个b’导致sql语句拼接的时候这个<strong>b后面的单引号会和sql语句的引号结合</strong>，导致后面的二进制没有在引号里面出错！二进制编码又不像string可以对字符转义，试了好多方法都不行！最后没有办法使用base64 对二进制进行加密转化成字符串，存到数据库中，然后要用时的时候再解密。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pic_bin = str(base64.b64encode(pic_bin))[<span class="number">2</span>:<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
-<h3 id="改配置文件"><a href="#改配置文件" class="headerlink" title="改配置文件"></a><strong>改配置文件</strong></h3><p>&emsp;&emsp;由于使用Python多进程,一个小时8G数据量，图片数据比较大，发包的时候回超过mysql的默认限制，出现Mysql server has gone away, 这个时候要改配置文件，在配置文件中参数</p>
-<p><strong>max_allowed_packet = 600M</strong><br><strong>wait_timeout = 60000</strong></p>
-<h3 id="Lost-connection-to-Mysql-server-during-query"><a href="#Lost-connection-to-Mysql-server-during-query" class="headerlink" title="Lost connection to Mysql server during query"></a><strong>Lost connection to Mysql server during query</strong></h3><p>&emsp;&emsp;程序跑着跑着总会出现这个错误，一直找原因，试了各种办法看了好多资料，一直都是错误。实在不知道什么原因了…后来一想，我管他什么原因，失去连接之后重新连接就行了。使用conn.Ping(True) 判断是否连接mysql成功。如果失去连接就重新连接就行了！最后解决了这个问题</p>
-<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a><strong>代码实现</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="comment"># Created by Baoyi on 2017/10/16</span></span><br><span class="line"><span class="keyword">from</span> multiprocessing.pool <span class="keyword">import</span> Pool</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> exifread</span><br><span class="line"><span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="keyword">import</span> configparser</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置logging</span></span><br><span class="line">logging.basicConfig(level=logging.WARNING,</span><br><span class="line">                    format=<span class="string">'%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s'</span>,</span><br><span class="line">                    datefmt=<span class="string">'%a, %d %b %Y %H:%M:%S'</span>,</span><br><span class="line">                    filename=<span class="string">'weibo.log'</span>,</span><br><span class="line">                    filemode=<span class="string">'w'</span>)</span><br><span class="line"></span><br><span class="line">cf = configparser.ConfigParser()</span><br><span class="line">cf.read(<span class="string">"ConfigParser.conf"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取配置mysql</span></span><br><span class="line">db_host = cf.get(<span class="string">"mysql"</span>, <span class="string">"db_host"</span>)</span><br><span class="line">db_port = cf.getint(<span class="string">"mysql"</span>, <span class="string">"db_port"</span>)</span><br><span class="line">db_user = cf.get(<span class="string">"mysql"</span>, <span class="string">"db_user"</span>)</span><br><span class="line">db_pass = cf.get(<span class="string">"mysql"</span>, <span class="string">"db_pass"</span>)</span><br><span class="line">db = cf.get(<span class="string">"mysql"</span>, <span class="string">"db"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建连接</span></span><br><span class="line">conn = pymysql.connect(host=db_host, user=db_user, passwd=db_pass, db=db, port=db_port, charset=<span class="string">'utf8'</span>)</span><br><span class="line"><span class="comment"># 获取游标</span></span><br><span class="line">cursor = conn.cursor()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建insert_sql</span></span><br><span class="line">insert_blog_sql = (</span><br><span class="line">    <span class="string">"INSERT IGNORE INTO blog(userid, id, blog_text, lat, lng, created_time) VALUES('&#123;uid&#125;', '&#123;id&#125;','&#123;blog_text&#125;','&#123;lat&#125;','&#123;lng&#125;','&#123;created_time&#125;')"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">insert_pic_sql = (</span><br><span class="line">    <span class="string">"INSERT IGNORE INTO pics(pic_url, pic_bin, md5, exif) VALUES ('&#123;pic_url&#125;','&#123;pic_bin&#125;','&#123;md5&#125;','&#123;exif&#125;')"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">insert_relationship_sql = (</span><br><span class="line">    <span class="string">"INSERT IGNORE INTO relationship(id, md5) VALUES ('&#123;id&#125;','&#123;md5&#125;')"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">uid = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./data/final_id.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        uid.append(i.strip(<span class="string">'\r\n'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 处理图片数据</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_pic</span><span class="params">(pic_url)</span>:</span></span><br><span class="line">    large_pic_url = pic_url.replace(<span class="string">'thumbnail'</span>, <span class="string">'large'</span>)</span><br><span class="line">    large_bin = requests.get(large_pic_url)</span><br><span class="line">    <span class="keyword">return</span> large_bin.content</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_poiid_info</span><span class="params">(uid)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        url = <span class="string">'https://api.weibo.com/2/statuses/user_timeline.json'</span></span><br><span class="line">        load = &#123;</span><br><span class="line">            <span class="string">'access_token'</span>: <span class="string">'xxxxxxxxxx'</span>,</span><br><span class="line">            <span class="string">'uid'</span>: uid,</span><br><span class="line">            <span class="string">'count'</span>: <span class="number">100</span>,</span><br><span class="line">            <span class="string">'feature'</span>: <span class="number">2</span>,</span><br><span class="line">            <span class="string">'trim_user'</span>: <span class="number">1</span></span><br><span class="line">        &#125;</span><br><span class="line">        get_info = requests.get(url=url, params=load, timeout=(<span class="number">10</span>, <span class="number">10</span>))</span><br><span class="line">        <span class="keyword">if</span> get_info.status_code != <span class="number">200</span>:</span><br><span class="line">            logging.warning(ConnectionError)</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line">        info_json = json.loads(get_info.content)</span><br><span class="line">        info_json[<span class="string">'uid'</span>] = uid</span><br><span class="line">        statuses = info_json[<span class="string">'statuses'</span>]</span><br><span class="line">        <span class="comment"># 处理筛选微博数据</span></span><br><span class="line">        <span class="keyword">for</span> status <span class="keyword">in</span> statuses:</span><br><span class="line">            id = status[<span class="string">'idstr'</span>]</span><br><span class="line">            <span class="keyword">if</span> status[<span class="string">'geo'</span>] <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">                lat = status[<span class="string">'geo'</span>][<span class="string">'coordinates'</span>][<span class="number">0</span>]</span><br><span class="line">                lng = status[<span class="string">'geo'</span>][<span class="string">'coordinates'</span>][<span class="number">1</span>]</span><br><span class="line">                pic_urls = status[<span class="string">'pic_urls'</span>]</span><br><span class="line"></span><br><span class="line">                <span class="comment"># 判断是否在北京</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="number">115.7</span> &lt; lng &lt; <span class="number">117.4</span>) <span class="keyword">and</span> (<span class="number">39.4</span> &lt; lat &lt; <span class="number">41.6</span>):</span><br><span class="line">                    <span class="comment"># 若在北京,插入blog数据进库</span></span><br><span class="line">                    blog_text = status[<span class="string">'text'</span>].replace(<span class="string">'\''</span>, <span class="string">'\'\''</span>)</span><br><span class="line">                    created_time = status[<span class="string">'created_at'</span>]</span><br><span class="line">                    <span class="keyword">try</span>:</span><br><span class="line">                        cursor.execute(</span><br><span class="line">                            insert_blog_sql.format(uid=uid, id=id, blog_text=blog_text, lat=lat, lng=lng,</span><br><span class="line">                                                   created_time=created_time))</span><br><span class="line">                    <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e_blog:</span><br><span class="line">                        logging.warning(e_blog.args[<span class="number">1</span>])</span><br><span class="line">                        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">                    <span class="comment"># conn.commit()</span></span><br><span class="line">                    <span class="comment"># 处理图片</span></span><br><span class="line">                    <span class="keyword">for</span> pic_url <span class="keyword">in</span> pic_urls:</span><br><span class="line">                        <span class="comment"># 获取原图片二进制数据</span></span><br><span class="line">                        pic_bin = handle_pic(pic_url[<span class="string">'thumbnail_pic'</span>])</span><br><span class="line"></span><br><span class="line">                        <span class="comment"># 读取exif 数据</span></span><br><span class="line">                        pic_file = BytesIO(pic_bin)  <span class="comment"># 将二进制数据转化成文件对象便于读取exif数据信息和生成MD5</span></span><br><span class="line">                        tag1 = exifread.process_file(pic_file, details=<span class="keyword">False</span>, strict=<span class="keyword">True</span>)</span><br><span class="line">                        tag = &#123;&#125;</span><br><span class="line">                        <span class="keyword">for</span> key, value <span class="keyword">in</span> tag1.items():</span><br><span class="line">                            <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> (</span><br><span class="line">                                    <span class="string">'JPEGThumbnail'</span>, <span class="string">'TIFFThumbnail'</span>, <span class="string">'Filename'</span>,</span><br><span class="line">                                    <span class="string">'EXIF MakerNote'</span>):  <span class="comment"># 去除四个不必要的exif属性，简化信息量</span></span><br><span class="line">                                tag[key] = str(value)</span><br><span class="line">                        tags = json.dumps(tag)  <span class="comment"># dumps为json类型 此tag即为exif的json数据</span></span><br><span class="line">                        <span class="comment"># 生成MD5</span></span><br><span class="line">                        MD5 = hashlib.md5(pic_file.read()).hexdigest()</span><br><span class="line">                        <span class="comment"># 首先把二进制图片用base64 转成字符串之后再存</span></span><br><span class="line">                        <span class="keyword">try</span>:</span><br><span class="line">                            cursor.execute(</span><br><span class="line">                                insert_pic_sql.format(pic_url=pic_url[<span class="string">'thumbnail_pic'</span>].replace(<span class="string">'thumbnail'</span>, <span class="string">'large'</span>),</span><br><span class="line">                                                      pic_bin=str(base64.b64encode(pic_bin))[<span class="number">2</span>:<span class="number">-1</span>], md5=MD5,</span><br><span class="line">                                                      exif=tags))</span><br><span class="line">                        <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e_pic:</span><br><span class="line">                            logging.warning(e_pic.args[<span class="number">1</span>])</span><br><span class="line">                            <span class="keyword">pass</span></span><br><span class="line">                        <span class="keyword">try</span>:</span><br><span class="line">                            cursor.execute(insert_relationship_sql.format(id=id, md5=MD5))</span><br><span class="line">                        <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e_relation:</span><br><span class="line">                            logging.warning(e_relation)</span><br><span class="line">                            <span class="keyword">pass</span></span><br><span class="line">                        conn.commit()</span><br><span class="line"></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    logging.info(id + <span class="string">" is Not in Beijing"</span>)</span><br><span class="line">                    <span class="keyword">pass</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                logging.info(id + <span class="string">' Geo is null'</span>)</span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e:</span><br><span class="line">        logging.error(e.args[<span class="number">1</span>])</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">judge_conn</span><span class="params">(i)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> conn</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        conn.ping(<span class="keyword">True</span>)</span><br><span class="line">        get_poiid_info(i)</span><br><span class="line">    <span class="keyword">except</span> pymysql.err.OperationalError <span class="keyword">as</span> e:</span><br><span class="line">        logging.error(<span class="string">'Reconnect'</span>)</span><br><span class="line">        conn = pymysql.connect(host=db_host, user=db_user, passwd=db_pass, db=db, charset=<span class="string">'utf8'</span>)</span><br><span class="line">        get_poiid_info(i)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_tuple</span><span class="params">(a_tuple)</span>:</span></span><br><span class="line">    read_uid_set = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> a_tuple:</span><br><span class="line">        read_uid_set.append(i[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">return</span> set(read_uid_set)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    sql_find_uid = (</span><br><span class="line">        <span class="string">"SELECT userid FROM blog"</span></span><br><span class="line">    )</span><br><span class="line">    cursor.execute(sql_find_uid)</span><br><span class="line">    read_uid_tuple = cursor.fetchall()</span><br><span class="line">    read_list = handle_tuple(read_uid_tuple)</span><br><span class="line">    print(len(read_list))</span><br><span class="line"></span><br><span class="line">    new_uid = set(uid).difference(read_list)</span><br><span class="line">    print(len(new_uid))</span><br><span class="line"></span><br><span class="line">    pool = Pool()</span><br><span class="line">    pool.map(judge_conn, list(new_uid))</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/通用论坛正文提取/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yuboona Zhang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Thinking makes Someone">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/22/通用论坛正文提取/" itemprop="url">通用论坛正文提取</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T21:25:07+08:00">
-                2017-12-22
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:46:09+08:00">
+                2020-01-12
               </time>
             
 
@@ -1751,7 +453,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/Generic-Algorithm/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yuboona Zhang">
@@ -1770,7 +472,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/12/20/Generic-Algorithm/" itemprop="url">Generic Algorithm</a></h1>
+                <a class="post-title-link" href="/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/" itemprop="url">使用Dlib、PyQt搭建人脸识别系统</a></h1>
         
 
         <div class="post-meta">
@@ -1782,8 +484,142 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-20T14:54:45+08:00">
-                2017-12-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:46:07+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="使用Dlib、PyQt搭建人脸识别系统"><a href="#使用Dlib、PyQt搭建人脸识别系统" class="headerlink" title="使用Dlib、PyQt搭建人脸识别系统"></a>使用Dlib、PyQt搭建人脸识别系统</h1><h2 id="１、软硬件需求"><a href="#１、软硬件需求" class="headerlink" title="１、软硬件需求"></a>１、软硬件需求</h2><ol>
+<li><p>开发及实验平台(windows也是一样的)<br> Ubuntu 16.04.1 x64；内核版本：4.8.0-36-generic</p>
+</li>
+<li><p>软件配置<br> 数据库: Python 模块Sqlite3版本：3.11.0<br> Python版本：3.5<br> PyQt5版本：5.10.1<br> Python模块Dlib版本：19.9.0<br> Python模块Opencv版本：3.4.0.12<br> Python 模块face-recognition版本：1.2.2<br> Python模块 numpy版本：1.14.2<br> Python模块 pandas版本：0.22.0</p>
+</li>
+<li><p>硬件<br> 测试机：thinkpad E440<br> 摄像头：电脑自带720p HD摄像头</p>
+</li>
+</ol>
+<p>注意:**所有软件配置中python模块的安装都可以使用<figure class="highlight plain"><figcaption><span>insatll '模块名称'```完成，[pip安装方式][1]，但是Dib安装的时候需要系统满足一定条件才能安装，[ubuntu安装Dlib][2]/[windows安装Dlib][3]**</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## ２、什么是PyQt</span><br><span class="line"></span><br><span class="line">PyQt是一个图形化软件开发的库，基于python，使用方便而且功能完善。</span><br><span class="line"></span><br><span class="line">## ３、人脸识别功能的实现</span><br><span class="line"></span><br><span class="line">### 如何识别人脸</span><br><span class="line"></span><br><span class="line">简单的识别人脸可以借助face-recognition这个python模块中的接口实现，这个模块内部调用了Dlib来实现人脸识别，但是它对Dlib的使用比较粗糙，有很多可以我们自由改进。在进阶方案中我们可以自己来修改face-recognition的源码达到改善识别效果的目的。</span><br><span class="line">下面用一个[例子][4]来介绍face-recognition的使用：</span><br><span class="line">```python</span><br><span class="line">import face_recognition</span><br><span class="line">import cv2</span><br><span class="line"></span><br><span class="line"># 开启摄像头</span><br><span class="line">video_capture = cv2.VideoCapture(0)</span><br><span class="line"></span><br><span class="line"># 载入一张已知的照片作为识别的先验参照，不然没有办法分辨谁是谁，这张照片可以放在当前文件夹中</span><br><span class="line">obama_image = face_recognition.load_image_file(&quot;已知人脸的图片.jpg&quot;)</span><br><span class="line"># 使用face_recognition模块把已知人脸图片的编码取出来</span><br><span class="line">face_encoding1 = face_recognition.face_encodings(obama_image)[0]</span><br><span class="line"></span><br><span class="line"># 载入第二张已知的照片作为识别的先验参照，这张照片可以放在当前文件夹中</span><br><span class="line">biden_image = face_recognition.load_image_file(&quot;已知人脸的图片2.jpg&quot;)</span><br><span class="line"># 使用face_recognition模块把已知人脸图片的编码取出来，</span><br><span class="line">face_encoding2 = face_recognition.face_encodings(biden_image)[0]</span><br><span class="line"></span><br><span class="line"># 用列表把已经编码的已知人脸特征编码存起来</span><br><span class="line">known_face_encodings = [</span><br><span class="line">    face_encoding1,</span><br><span class="line">    face_encoding2</span><br><span class="line">]</span><br><span class="line"># 把名字按顺序存起来</span><br><span class="line">known_face_names = [</span><br><span class="line">    &quot;名字1&quot;,</span><br><span class="line">    &quot;名字2&quot;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 准备一些变量</span><br><span class="line">face_locations = []</span><br><span class="line">face_encodings = []</span><br><span class="line">face_names = []</span><br><span class="line">process_this_frame = True</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    # 获取一帧摄像头图像</span><br><span class="line">    ret, frame = video_capture.read()</span><br><span class="line"></span><br><span class="line">    # 将图像缩小为原来的1/4这样处理起来比较快</span><br><span class="line">    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)</span><br><span class="line"></span><br><span class="line">    # 这行代码将图像从BGR（opencv当前从摄像头获取的图片，以这种颜色格式存储着）转化为RGB(等会用到的颜色是这种颜色)</span><br><span class="line">    rgb_small_frame = small_frame[:, :, ::-1]</span><br><span class="line"></span><br><span class="line">    # 只处理process_this_frame = True的帧，减少计算量</span><br><span class="line">    if process_this_frame:</span><br><span class="line">        # 找到当前摄像头中所有的人脸的位置，把这些位置保存起来</span><br><span class="line">        face_locations = face_recognition.face_locations(rgb_small_frame)</span><br><span class="line">        # 将找到的人脸都编码为人脸特征编码</span><br><span class="line">        face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)</span><br><span class="line"></span><br><span class="line">        face_names = []</span><br><span class="line">        # 查找摄像头中的人脸与已知人脸中的哪一个最为相像</span><br><span class="line">        for face_encoding in face_encodings:</span><br><span class="line">            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)</span><br><span class="line">            name = &quot;Unknown&quot;</span><br><span class="line"></span><br><span class="line">            # 使用所有匹配的人脸中排序最先的那一个作为身份</span><br><span class="line">            if True in matches:</span><br><span class="line">                first_match_index = matches.index(True)</span><br><span class="line">                name = known_face_names[first_match_index]</span><br><span class="line"></span><br><span class="line">            face_names.append(name)</span><br><span class="line"></span><br><span class="line">    process_this_frame = not process_this_frame</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    # 将识别结果在展示在一个窗口中</span><br><span class="line">    for (top, right, bottom, left), name in zip(face_locations, face_names):</span><br><span class="line">        # 将人脸位置放大四倍，因为之前缩小了</span><br><span class="line">        top *= 4</span><br><span class="line">        right *= 4</span><br><span class="line">        bottom *= 4</span><br><span class="line">        left *= 4</span><br><span class="line"></span><br><span class="line">        # 用刚才得到的人脸位置在图像中画出方框框住人脸</span><br><span class="line">        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)</span><br><span class="line"></span><br><span class="line">        # 在人脸框的下面画上一个方框，放识别出来的名字</span><br><span class="line">        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)</span><br><span class="line">        font = cv2.FONT_HERSHEY_DUPLEX</span><br><span class="line">        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)</span><br><span class="line"></span><br><span class="line">    # 显示出身份识别结果</span><br><span class="line">    cv2.imshow(&apos;Video&apos;, frame)</span><br><span class="line"></span><br><span class="line">    # 设置按&apos;q&apos;建就会退出</span><br><span class="line">    if cv2.waitKey(1) &amp; 0xFF == ord(&apos;q&apos;):</span><br><span class="line">        break</span><br><span class="line"></span><br><span class="line"># 释放摄像头</span><br><span class="line">video_capture.release()</span><br><span class="line">cv2.destroyAllWindows()</span><br></pre></td></tr></table></figure></p>
+<p>通过以上的代码可以了解如何使用face-recognition这一模块来进行人脸识别。</p>
+<h3 id="使用PyQt"><a href="#使用PyQt" class="headerlink" title="使用PyQt"></a>使用PyQt</h3><h4 id="1-设计PyQt界面"><a href="#1-设计PyQt界面" class="headerlink" title="(1)设计PyQt界面"></a>(1)设计PyQt界面</h4><p>Qt5界面可以使用Qt designer这一工具进行设计，但是PyQt5的界面有没有简便的工具呢。事实上PyQt5也使用Qt designer这一工具，在设计完成之后，可以使用pyuic工具转换为python可以使用的界面文件<br><img src="/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/2018-06-18.png" alt="人脸识别界面"><br>如图所示为我用Qt designer设计的一个界面.ui文件，使用如下的命令将界面源码转换为.py格式的PyQt可以使用的界面文件face_check.py</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pyuic -x -o face_check.py face_check.py</span><br></pre></td></tr></table></figure>
+<h4 id="2-为界面添加交互"><a href="#2-为界面添加交互" class="headerlink" title="(2)为界面添加交互"></a>(2)为界面添加交互</h4><p>但是有了界面之后，人机交互应该如何实现呢，这需要涉及到PyQt的交互机制，下面的代码展示了为“开始”按钮增加一个点击事件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">__author__ = <span class="string">'Zhang Zhe'</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> PyQt5 <span class="keyword">import</span> QtWidgets</span><br><span class="line"><span class="keyword">from</span> face_check <span class="keyword">import</span> Ui_FaceCheck</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个新的类，这个类继承由Qt designer生成的界面类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FaceCheck</span><span class="params">(QtWidgets.QDialog, Ui_FaceCheck)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent=None)</span>:</span></span><br><span class="line">        <span class="comment"># 用来调用基类中的初始化函数</span></span><br><span class="line">        super(FaceCheck, self).__init__()</span><br><span class="line">        self.setupUi(self)</span><br><span class="line">        <span class="comment"># 通过将“开始”按钮与onStartBtnClicked()函数连接起来，为“开始”按钮增加点击事件</span></span><br><span class="line">        self.start.clicked.connect(self.onStartBtnClicked)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">onStartBtnClicked</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        登录的点击事件</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># 开始按钮的点击事件只输出一句话“这是开始按钮”，这句话将被输出到控制台的输出中</span></span><br><span class="line">        print(<span class="string">"这是开始按钮！！！"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app = QtWidgets.QApplication(sys.argv)</span><br><span class="line">    FaceCheck = FaceCheck()</span><br><span class="line">    FaceCheck.show()</span><br><span class="line">    sys.exit(app.exec_())</span><br></pre></td></tr></table></figure>
+<p>PyQt中提供了和Qt一样的信号槽机制。对于按钮来说，其默认有一个clicked事件可以连接</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/解决CMAKE编译第三方开源软件需要下载的问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/12/解决CMAKE编译第三方开源软件需要下载的问题/" itemprop="url">解决CMAKE编译第三方开源软件需要下载的问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:46:03+08:00">
+                2020-01-12
               </time>
             
 
@@ -1805,8 +641,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithms/" itemprop="url" rel="index">
-                    <span itemprop="name">Algorithms</span>
+                  <a href="/categories/编译开源软件/" itemprop="url" rel="index">
+                    <span itemprop="name">编译开源软件</span>
                   </a>
                 </span>
 
@@ -1844,7 +680,615 @@
       
         
           
-            <h1 id="Generic-Algorithm"><a href="#Generic-Algorithm" class="headerlink" title="Generic Algorithm"></a>Generic Algorithm</h1>
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
+<h1 id="解决CMAKE编译第三方开源软件需要下载的问题"><a href="#解决CMAKE编译第三方开源软件需要下载的问题" class="headerlink" title="解决CMAKE编译第三方开源软件需要下载的问题"></a>解决CMAKE编译第三方开源软件需要下载的问题</h1><p>经常会出现这种问题：我们从github上面下载了一些开源软件，但是这个开源软件<strong>本身其实是会下载很多其他开源软件</strong>，编译后作为软件的一部分。<br>看起来好像没什么问题，但是有时候这个下载很耗时间，让整个安装变得很慢，它本身的这个下载过程下载东西真的很不稳定。所以就导致了有可能的安装失败。重新多次安装又要多次下载，这个过程真的很浪费时间和网络资源硬盘资源。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过对于我最近使用的一个软件的cmake过程的研究，发现这个软件安装时进行第三方的包的下载的时候，是通过CMAKE自带的下载和编译功能进行的。所以为了：</p>
+<ul>
+<li>能够让下载第三方源码的过程被消除</li>
+<li>同时为了保证不发生因为下载慢，导致的第三方的开源软件的编译的<strong>进程竞争</strong>，进而导致安装时的开源软件之间的互相依赖或者make文件不存在问题。</li>
+</ul>
+<h3 id="–采用网上对于CMAKE过程的修改方法"><a href="#–采用网上对于CMAKE过程的修改方法" class="headerlink" title="–采用网上对于CMAKE过程的修改方法"></a>–采用网上对于CMAKE过程的修改方法</h3><ol>
+<li><p>将.cmake 文件中的以下代码<br> #–Download step————–<br> DOWNLOAD_DIR      ${SB_DOWNLOAD_DIR}<br> URL  <a href="https://github.com/gflags/gflags/archive/v2.1.2.zip" target="_blank" rel="noopener">https://github.com/gflags/gflags/archive/v2.1.2.zip</a><br> URL_MD5           5cb0a1b38740ed596edb7f86cd5b3bd8<br> 部分更改为<br> #–Download step————–<br> DOWNLOAD_COMMAND “”</p>
+</li>
+<li><p>同时，将src（这个文件是原本解压下载的第三方源码source的地方，具体名称要看CMakeLists.txt中SOURCE_DIR的设置）中的各个第三方源码都解压好，放到src对应的文件夹中。</p>
+</li>
+</ol>
+<p>结果：<strong>这样整个程序编译第三方开源软件的编译过程就可以直接调用src目录中我们早就自己下载好的源码进行安装了</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/using-Electron-to-create-app-with-Js-html-css/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/12/using-Electron-to-create-app-with-Js-html-css/" itemprop="url">using-Electron-to-create-app-with-Js-html-css</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:46:01+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/App/" itemprop="url" rel="index">
+                    <span itemprop="name">App</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="notes-of-Electron-Api-Demo"><a href="#notes-of-Electron-Api-Demo" class="headerlink" title="notes of Electron Api Demo"></a>notes of Electron Api Demo</h1><hr>
+<p><img src="/2020/01/12/using-Electron-to-create-app-with-Js-html-css/ui-terminology.png" alt="section&amp;category"></p>
+<h2 id="1-add-a-new-section-to-program"><a href="#1-add-a-new-section-to-program" class="headerlink" title="1. add a new section to program"></a>1. add a new section to program</h2><p>A <strong>category</strong> is consist of several sections, and the section is a part that contains a individual page  </p>
+<p>To create a new <strong>section</strong> in code, add following code in <code>index.html</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">id</span>=<span class="string">"xxx2"</span> <span class="attr">data-section</span>=<span class="string">"xxx2"</span> <span class="attr">class</span>=<span class="string">"nav-button"</span>&gt;</span>Use system <span class="tag">&lt;<span class="name">em</span>&gt;</span>dialogs<span class="tag">&lt;/<span class="name">em</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>in this pice of code, the real important element is <code>(1)data-section=&quot; &quot;</code> and <code>(2)class=&quot; &quot;</code></p>
+<ul>
+<li><p><code>(1)data-section=&quot; &quot;</code> is relevant to template file to the file of the import links in the <code>head</code> of <code>index.html</code>. for example:</p>
+  <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"import"</span> <span class="attr">href</span>=<span class="string">"sections/native-ui/dialogs.html"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>  the file name is of no use in fact(you can choose no matter what), but it can tell what the file’s content is. The real thing makes the Electron knows what to render is this <code>data-section=&quot;xxx2&quot;</code> in <code>index.html</code>  and the <code>id=&quot;xxx2-section&quot;</code> in template file’s <code>&lt;section&gt;</code> tag.<br>  when you make <code>xxx2</code> the same in two files, then the Electron can render the correct html for <strong>section</strong></p>
+</li>
+<li><code>(2)class=&quot; &quot;</code> is about the style of the <strong>section</strong> looking like. In css file, it will all be defined.</li>
+</ul>
+<h2 id="2-add-a-demo"><a href="#2-add-a-demo" class="headerlink" title="2.add a demo"></a>2.add a demo</h2><p>We can just copy a demo code of <code>&lt;div class=&quot;demo&quot;&gt;</code> and paste to get a new <strong>demo</strong>, but the process of this <strong>demo</strong> must contain new JS action code different from the <strong>old demo</strong>.Or the new demo will just can be clicked but do nothing.  </p>
+<p>We can find that when the <strong>section</strong> code be imported by the head lines in <code>index.html</code>, the JS code used in the section code also is imported together.So the same JS code will just be imported once and just for  <strong>the first section</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/python爬取图片/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/12/python爬取图片/" itemprop="url">python爬取图片</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:46:00+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近在做机器学习下的人脸识别的学习，机器学习这个东西有点暴力，很大程度上靠训练的数据量来决定效果。为了找数据，通过一个<a href="http://blog.csdn.net/chenriwei2/article/details/50631212" target="_blank" rel="noopener">博客</a>的指导，浏览了几个很知名的数据集。</p>
+<p>几个大型数据集是通过发邮件申请进行下载，几个小型数据集直接在网页的链接下载，还有一个<a href="http://www.cs.columbia.edu/CAVE/databases/pubfig/" target="_blank" rel="noopener">Pubfig</a>数据集则是提供了大量图片的链接来让我们自己写程序来下载。</p>
+<p>权衡了数据量的需求，最后选择Pubfig的数据集，于是就自己写了一个python图片采集程序，里面用了urllib和requests两种方法.</p>
+<h2 id="分析Pubfig提供的下载文件的特点"><a href="#分析Pubfig提供的下载文件的特点" class="headerlink" title="分析Pubfig提供的下载文件的特点"></a>分析<a href="http://www.cs.columbia.edu/CAVE/databases/pubfig/" target="_blank" rel="noopener">Pubfig</a>提供的下载文件的特点</h2><p><img src="/2020/01/12/python爬取图片/people.png" alt="people"><br>这个数据文件提供了在数据集中出现的所有人物<br><img src="/2020/01/12/python爬取图片/urls.png" alt="urls"><br>这个数据文件提供了每个人的urls</p>
+<p>可以看出来这个数据集的处理其实非常简单了，可以通过readlines的方式存进列表用空格分开一下数据就可以把urls提取出来了。</p>
+<h2 id="处理一下urls文件"><a href="#处理一下urls文件" class="headerlink" title="处理一下urls文件"></a>处理一下urls文件</h2><p>urls在文件的中后部，写个文件把它单纯地提取出来，方便使用。<br>我单独把Miley_Cyrus的部分提取出来放了一个txt文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">pic_url = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./Miley_Cyrus.txt'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        pic_url.append(i.strip(<span class="string">'\r\n'</span>))</span><br><span class="line"></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> pic_url:</span><br><span class="line">    _, _, _, url, _, _ = s.split()</span><br><span class="line">    urls.append(url)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写入到文件里面</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'url.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> urls:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="爬取urls图片"><a href="#爬取urls图片" class="headerlink" title="爬取urls图片"></a>爬取urls图片</h2><h3 id="1-Urllibs方法"><a href="#1-Urllibs方法" class="headerlink" title="1. Urllibs方法"></a>1. Urllibs方法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib.request <span class="keyword">as</span> request</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在同级目录新建文件夹存图片</span></span><br><span class="line">os.mkdir(<span class="string">'./img'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为请求增加一下头</span></span><br><span class="line">user_agent = <span class="string">'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'</span></span><br><span class="line">headers = (<span class="string">'User-Agent'</span>, user_agent)</span><br><span class="line">opener = request.build_opener()</span><br><span class="line">opener.addheaders = [headers]</span><br><span class="line">request.install_opener(opener)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设定一下无响应时间，防止有的坏图片长时间没办法下载下来</span></span><br><span class="line">timeout = <span class="number">20</span></span><br><span class="line">socket.setdefaulttimeout(timeout)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从文件里面读urls</span></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./url.data'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        <span class="keyword">if</span> i != <span class="string">''</span>:</span><br><span class="line">            urls.append(i)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过urllibs的requests获取所有的图片</span></span><br><span class="line">count = <span class="number">1</span></span><br><span class="line">bad_url = []</span><br><span class="line"><span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">    url.rstrip(<span class="string">'\n'</span>)</span><br><span class="line">    print(url)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pic = request.urlretrieve(url, <span class="string">'./img3/%d.jpg'</span> % count)</span><br><span class="line">        print(<span class="string">'pic %d'</span> % count)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        print(Exception, <span class="string">':'</span>, e)</span><br><span class="line">        bad_url.append(url)</span><br><span class="line">    print(<span class="string">'\n'</span>)</span><br><span class="line">print(<span class="string">'got all photos that can be got'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把没有抓取到的urls保存起来</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'bad_url3.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> bad_url:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br><span class="line">    print(<span class="string">'saved bad urls'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="2-Requests方法"><a href="#2-Requests方法" class="headerlink" title="2. Requests方法"></a>2. Requests方法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在同级目录新建文件夹存图片</span></span><br><span class="line">os.mkdir(<span class="string">'./img'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设定一下无响应时间，防止有的坏图片长时间没办法下载下来</span></span><br><span class="line">timeout = <span class="number">20</span></span><br><span class="line">socket.setdefaulttimeout(timeout)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从文件里面读urls</span></span><br><span class="line">urls = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./url.data'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">        <span class="keyword">if</span> i != <span class="string">''</span>:</span><br><span class="line">            urls.append(i)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为请求增加一下头，获取图片</span></span><br><span class="line">user_agent = <span class="string">'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36'</span></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: user_agent</span><br><span class="line">&#125;</span><br><span class="line">bad_url = []</span><br><span class="line">count = <span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> url <span class="keyword">in</span> urls:</span><br><span class="line">    url.rstrip(<span class="string">'\n'</span>)</span><br><span class="line">    print(url)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pic = requests.get(url, headers=headers)</span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">'./img2/%d.jpg'</span> % count, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(pic.content)</span><br><span class="line">            f.flush()</span><br><span class="line">        print(<span class="string">'pic %d'</span> % count)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        print(Exception, <span class="string">':'</span>, e)</span><br><span class="line">        bad_url.append(url)</span><br><span class="line">    print(<span class="string">'\n'</span>)</span><br><span class="line">print(<span class="string">'got all photos that can be got'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存坏链接</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'bad_url.data'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> bad_url:</span><br><span class="line">        f.write(i)</span><br><span class="line">        f.write(<span class="string">'\n'</span>)</span><br><span class="line">    print(<span class="string">'saved bad urls'</span>)</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/MongoDB的find函数如何使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/12/MongoDB的find函数如何使用/" itemprop="url">MongoDB的find函数如何使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:45:58+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="MongoDB的find函数如何使用"><a href="#MongoDB的find函数如何使用" class="headerlink" title="MongoDB的find函数如何使用"></a><strong>MongoDB的find函数如何使用</strong></h1><hr>
+<h2 id="1、Why-为什么使用find-函数"><a href="#1、Why-为什么使用find-函数" class="headerlink" title="1、Why?为什么使用find()函数"></a>1、Why?为什么使用find()函数</h2><p>我在mongo中存储的数据是爬网页的json数据，结构较为复杂，json内部嵌套的很厉害，光靠眼睛来看找数据好像有点困难。pycharm上的插件提供了搜查功能，可是我发现，但仍然还是要自己用json的格式提供要搜的关键词和值。经过搜集也可以发现其实这个功能只是对find()函数的一个封装。<br>所以，我们要用find()</p>
+<h2 id="2、示例数据"><a href="#2、示例数据" class="headerlink" title="2、示例数据"></a>2、示例数据</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">示例数据json:</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"_id"</span>: &#123;</span><br><span class="line">        <span class="attr">"$oid"</span>: <span class="string">"5adcae9b3fa8b06fdbe7184e"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"json"</span>: &#123;</span><br><span class="line">        <span class="attr">"sjkList"</span>: [&#123;</span><br><span class="line">            <span class="attr">"jxbmc"</span>: <span class="string">"面向对象程序设计课程设计-0022"</span>,</span><br><span class="line">            <span class="attr">"userModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"roleCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"status"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"monitor"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleKeys"</span>: <span class="string">""</span>,</span><br><span class="line">                <span class="attr">"usable"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleValues"</span>: <span class="string">""</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"jgpxzd"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"totalResult"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"zhxs"</span>: <span class="string">"2"</span>,</span><br><span class="line">            <span class="attr">"qsz"</span>: <span class="string">"21"</span>,</span><br><span class="line">            <span class="attr">"listnav"</span>: <span class="string">"false"</span>,</span><br><span class="line">            <span class="attr">"jxb_id"</span>: <span class="string">"62DAED714DEEA4ECE0530C0114AC99EB"</span>,</span><br><span class="line">            <span class="attr">"xqdm"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"kcmc"</span>: <span class="string">"面向对象程序设计课程设计"</span>,</span><br><span class="line">            <span class="attr">"localeKey"</span>: <span class="string">"zh_CN"</span>,</span><br><span class="line">            <span class="attr">"sfsjk"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"xm"</span>: <span class="string">"孙斌"</span>,</span><br><span class="line">            <span class="attr">"xqh_id"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"rsdzjs"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"zzz"</span>: <span class="string">"22"</span>,</span><br><span class="line">            <span class="attr">"rangeable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"jxbzh"</span>: <span class="string">"117171;117172"</span>,</span><br><span class="line">            <span class="attr">"pageable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"queryModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"totalPage"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentPage"</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">"totalCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"entityOrField"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"pageNo"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"offset"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"pageSize"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"limit"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"totalResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"showCount"</span>: <span class="number">10</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            <span class="attr">"jxbmc"</span>: <span class="string">"自然地理与地质学实习-0003"</span>,</span><br><span class="line">            <span class="attr">"userModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"roleCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"status"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"monitor"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleKeys"</span>: <span class="string">""</span>,</span><br><span class="line">                <span class="attr">"usable"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"roleValues"</span>: <span class="string">""</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"jgpxzd"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"totalResult"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"zhxs"</span>: <span class="string">"2"</span>,</span><br><span class="line">            <span class="attr">"qsz"</span>: <span class="string">"22"</span>,</span><br><span class="line">            <span class="attr">"listnav"</span>: <span class="string">"false"</span>,</span><br><span class="line">            <span class="attr">"jxb_id"</span>: <span class="string">"5F7A59A6AB1521FDE0530B0114ACF30A"</span>,</span><br><span class="line">            <span class="attr">"xqdm"</span>: <span class="string">"0"</span>,</span><br><span class="line">            <span class="attr">"kcmc"</span>: <span class="string">"自然地理与地质学实习"</span>,</span><br><span class="line">            <span class="attr">"localeKey"</span>: <span class="string">"zh_CN"</span>,</span><br><span class="line">            <span class="attr">"sfsjk"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"xm"</span>: <span class="string">"孙斌"</span>,</span><br><span class="line">            <span class="attr">"xqh_id"</span>: <span class="string">"1"</span>,</span><br><span class="line">            <span class="attr">"rsdzjs"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"zzz"</span>: <span class="string">"23"</span>,</span><br><span class="line">            <span class="attr">"rangeable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"jxbzh"</span>: <span class="string">"117171;117172"</span>,</span><br><span class="line">            <span class="attr">"pageable"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"queryModel"</span>: &#123;</span><br><span class="line">                <span class="attr">"totalPage"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentPage"</span>: <span class="number">1</span>,</span><br><span class="line">                <span class="attr">"totalCount"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"entityOrField"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="attr">"pageNo"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"offset"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"currentResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"pageSize"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"limit"</span>: <span class="number">15</span>,</span><br><span class="line">                <span class="attr">"totalResult"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"showCount"</span>: <span class="number">10</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3、find-怎么用"><a href="#3、find-怎么用" class="headerlink" title="3、find()怎么用"></a>3、find()怎么用</h2><p>find()函数的基本用法很简单</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line">MongoClient[<span class="string">'你的库名'</span>][<span class="string">'你的表名'</span>].find(&#123;<span class="string">'key'</span>:<span class="string">'要搜的value'</span>&#125;)</span><br></pre></td></tr></table></figure>
+<p>但是对应实例数据，复杂json嵌套数据下这个简单的搜索方法好像没用，找了很久网页，基本都是浅尝辄止，或者介绍的和我关心的不在一个频道。</p>
+<p>但是后来还是找到了正确的方法：<br>可以看到第二个关键字’json’中的嵌套了数组，数组的组成单位是json串<br>为了获得”jxb_id”: “5F7A59A6AB1521FDE0530B0114ACF30A”这个关键词对应的数据，我们可以使用如下方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line">MongoClient[<span class="string">'你的库名'</span>][<span class="string">'你的表名'</span>].find(&#123;<span class="string">"json.sjkList.jxb_id"</span> : <span class="string">"5F7A59A6AB1521FDE0530B0114ACF30A"</span>&#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="4、如何理解"><a href="#4、如何理解" class="headerlink" title="4、如何理解"></a>4、如何理解</h2><p>想要理解为什么会这样来用，其实看一下mongodb的一些基本的命令行操作，会有一点启发，基本都会有’.’这个操作符号，这个操作符像是在往对象的内部不断地纵深。</p>
+<p>我们把每个关键字对应的值理解为一个对象，为了进入对象内部，用’.’来操作也就很理所当然了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/2018年使用ipv6-XX-net翻墙/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/12/2018年使用ipv6-XX-net翻墙/" itemprop="url">2018年使用ipv6-XX-net翻墙</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:45:56+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web/" itemprop="url" rel="index">
+                    <span itemprop="name">Web</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="2018年ubuntu使用XXnet"><a href="#2018年ubuntu使用XXnet" class="headerlink" title="2018年ubuntu使用XXnet"></a>2018年ubuntu使用XXnet</h1><hr>
+<p><em>从大概两个月前开始，xx-net开始不好用了，几乎所有的ipv4的ip都被封锁了没有办法上网，所以很长一段时间我告别了它，openvpn成了我的最后的伙伴（很多其他的手机vpn软件也开始失效了)</em><br><em>但是今天我终于通过使用ipv6借助xx-net又能翻出围墙了</em></p>
+<h2 id="1、准备工作"><a href="#1、准备工作" class="headerlink" title="1、准备工作"></a>1、准备工作</h2><ol>
+<li>下载最新版的<a href="https://github.com/XX-net/XX-Net/blob/master/code/default/download.md" target="_blank" rel="noopener">xx-net</a></li>
+<li>在ubuntu下安装miredo， miredo提供一种 IPv6/IPv4转换技术，它让只能访问ipv4的网络用户能够体验到ipv6的网络。当然如果你的网络运营商已经提供了ipv6服务那你就大可不必装这个软件了。（<a href="http://test-ipv6.com/" target="_blank" rel="noopener">查看是否支持ipv6</a>）</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装miredo</span><br><span class="line">sudo apt install miredo</span><br><span class="line"><span class="meta">#</span> 并且启动miredo，默认不是开机启动项，所以每次重新开机以后都要重新启动</span><br><span class="line">sudo service miredo start</span><br></pre></td></tr></table></figure>
+<h2 id="2、进行安装"><a href="#2、进行安装" class="headerlink" title="2、进行安装"></a>2、进行安装</h2><ol>
+<li>安装xx-net，这个大家应该都比较熟，首先解压安装包</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 解压</span><br><span class="line">sudo unzip XX-Net-3.8.7.zip</span><br><span class="line"><span class="meta">#</span> 移动xx-net到/opt/目录，这个目录是我比较喜欢的软件安装目录，一般deb包安装的软件也都是安装在这个目录下面</span><br><span class="line">sudo mv XX-Net-3.8.7 /opt/</span><br><span class="line"><span class="meta">#</span> 开始运行</span><br><span class="line">sudo /opt/XX-Net-3.8.7/start</span><br></pre></td></tr></table></figure>
+<h2 id="3、进入localhost-8085管理界面"><a href="#3、进入localhost-8085管理界面" class="headerlink" title="3、进入localhost:8085管理界面"></a>3、进入localhost:8085管理界面</h2><p>经过以上的步骤，我们已经开启了xx-net 以及 miredo服务,在浏览器中访问xx-net 的管理界面，我们现在应该能够看到一些内容<br><img src="/2020/01/12/2018年使用ipv6-XX-net翻墙/xx_net.png" alt="图片1">:</p>
+<h2 id="4、注意事项"><a href="#4、注意事项" class="headerlink" title="4、注意事项"></a>4、注意事项</h2><ol>
+<li>教育网没有办法使用miredo</li>
+<li>重启电脑后联网后，需要使用启动miredo</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo miredo</span><br></pre></td></tr></table></figure>
+
           
         
       
@@ -1882,10 +1326,6 @@
   </section>
 
   
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
-
 
 
           </div>
@@ -1929,7 +1369,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1940,7 +1380,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1951,7 +1391,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -2004,7 +1444,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="PyQt,FaceRecognition," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="使用Dlib、PyQt搭建人脸识别系统１、软硬件需求 开发及实验平台(windows也是一样的) Ubuntu 16.04.1 x64；内核版本：4.8.0-36-generic  软件配置 数据库: Python 模块Sqlite3版本：3.11.0 Python版本：3.5 PyQt5版本：5.10.1 Python模块Dlib版本：19.9.0 Python模块Opencv版本：3.4.0.">
+<meta name="keywords" content="PyQt,FaceRecognition">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Dlib、PyQt搭建人脸识别系统">
+<meta property="og:url" content="http://yoursite.com/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/index.html">
+<meta property="og:site_name" content="Thinking makes Someone">
+<meta property="og:description" content="使用Dlib、PyQt搭建人脸识别系统１、软硬件需求 开发及实验平台(windows也是一样的) Ubuntu 16.04.1 x64；内核版本：4.8.0-36-generic  软件配置 数据库: Python 模块Sqlite3版本：3.11.0 Python版本：3.5 PyQt5版本：5.10.1 Python模块Dlib版本：19.9.0 Python模块Opencv版本：3.4.0.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/2018-06-18.png">
+<meta property="og:updated_time" content="2020-01-12T02:53:09.535Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Dlib、PyQt搭建人脸识别系统">
+<meta name="twitter:description" content="使用Dlib、PyQt搭建人脸识别系统１、软硬件需求 开发及实验平台(windows也是一样的) Ubuntu 16.04.1 x64；内核版本：4.8.0-36-generic  软件配置 数据库: Python 模块Sqlite3版本：3.11.0 Python版本：3.5 PyQt5版本：5.10.1 Python模块Dlib版本：19.9.0 Python模块Opencv版本：3.4.0.">
+<meta name="twitter:image" content="http://yoursite.com/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/2018-06-18.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/"/>
+
+
+
+
+
+  <title>使用Dlib、PyQt搭建人脸识别系统 | Thinking makes Someone</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Thinking makes Someone</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Learn for Knowledge,Code from Zero.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Dlib、PyQt搭建人脸识别系统</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:46:07+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="使用Dlib、PyQt搭建人脸识别系统"><a href="#使用Dlib、PyQt搭建人脸识别系统" class="headerlink" title="使用Dlib、PyQt搭建人脸识别系统"></a>使用Dlib、PyQt搭建人脸识别系统</h1><h2 id="１、软硬件需求"><a href="#１、软硬件需求" class="headerlink" title="１、软硬件需求"></a>１、软硬件需求</h2><ol>
+<li><p>开发及实验平台(windows也是一样的)<br> Ubuntu 16.04.1 x64；内核版本：4.8.0-36-generic</p>
+</li>
+<li><p>软件配置<br> 数据库: Python 模块Sqlite3版本：3.11.0<br> Python版本：3.5<br> PyQt5版本：5.10.1<br> Python模块Dlib版本：19.9.0<br> Python模块Opencv版本：3.4.0.12<br> Python 模块face-recognition版本：1.2.2<br> Python模块 numpy版本：1.14.2<br> Python模块 pandas版本：0.22.0</p>
+</li>
+<li><p>硬件<br> 测试机：thinkpad E440<br> 摄像头：电脑自带720p HD摄像头</p>
+</li>
+</ol>
+<p>注意:**所有软件配置中python模块的安装都可以使用<figure class="highlight plain"><figcaption><span>insatll '模块名称'```完成，[pip安装方式][1]，但是Dib安装的时候需要系统满足一定条件才能安装，[ubuntu安装Dlib][2]/[windows安装Dlib][3]**</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## ２、什么是PyQt</span><br><span class="line"></span><br><span class="line">PyQt是一个图形化软件开发的库，基于python，使用方便而且功能完善。</span><br><span class="line"></span><br><span class="line">## ３、人脸识别功能的实现</span><br><span class="line"></span><br><span class="line">### 如何识别人脸</span><br><span class="line"></span><br><span class="line">简单的识别人脸可以借助face-recognition这个python模块中的接口实现，这个模块内部调用了Dlib来实现人脸识别，但是它对Dlib的使用比较粗糙，有很多可以我们自由改进。在进阶方案中我们可以自己来修改face-recognition的源码达到改善识别效果的目的。</span><br><span class="line">下面用一个[例子][4]来介绍face-recognition的使用：</span><br><span class="line">```python</span><br><span class="line">import face_recognition</span><br><span class="line">import cv2</span><br><span class="line"></span><br><span class="line"># 开启摄像头</span><br><span class="line">video_capture = cv2.VideoCapture(0)</span><br><span class="line"></span><br><span class="line"># 载入一张已知的照片作为识别的先验参照，不然没有办法分辨谁是谁，这张照片可以放在当前文件夹中</span><br><span class="line">obama_image = face_recognition.load_image_file(&quot;已知人脸的图片.jpg&quot;)</span><br><span class="line"># 使用face_recognition模块把已知人脸图片的编码取出来</span><br><span class="line">face_encoding1 = face_recognition.face_encodings(obama_image)[0]</span><br><span class="line"></span><br><span class="line"># 载入第二张已知的照片作为识别的先验参照，这张照片可以放在当前文件夹中</span><br><span class="line">biden_image = face_recognition.load_image_file(&quot;已知人脸的图片2.jpg&quot;)</span><br><span class="line"># 使用face_recognition模块把已知人脸图片的编码取出来，</span><br><span class="line">face_encoding2 = face_recognition.face_encodings(biden_image)[0]</span><br><span class="line"></span><br><span class="line"># 用列表把已经编码的已知人脸特征编码存起来</span><br><span class="line">known_face_encodings = [</span><br><span class="line">    face_encoding1,</span><br><span class="line">    face_encoding2</span><br><span class="line">]</span><br><span class="line"># 把名字按顺序存起来</span><br><span class="line">known_face_names = [</span><br><span class="line">    &quot;名字1&quot;,</span><br><span class="line">    &quot;名字2&quot;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 准备一些变量</span><br><span class="line">face_locations = []</span><br><span class="line">face_encodings = []</span><br><span class="line">face_names = []</span><br><span class="line">process_this_frame = True</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    # 获取一帧摄像头图像</span><br><span class="line">    ret, frame = video_capture.read()</span><br><span class="line"></span><br><span class="line">    # 将图像缩小为原来的1/4这样处理起来比较快</span><br><span class="line">    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)</span><br><span class="line"></span><br><span class="line">    # 这行代码将图像从BGR（opencv当前从摄像头获取的图片，以这种颜色格式存储着）转化为RGB(等会用到的颜色是这种颜色)</span><br><span class="line">    rgb_small_frame = small_frame[:, :, ::-1]</span><br><span class="line"></span><br><span class="line">    # 只处理process_this_frame = True的帧，减少计算量</span><br><span class="line">    if process_this_frame:</span><br><span class="line">        # 找到当前摄像头中所有的人脸的位置，把这些位置保存起来</span><br><span class="line">        face_locations = face_recognition.face_locations(rgb_small_frame)</span><br><span class="line">        # 将找到的人脸都编码为人脸特征编码</span><br><span class="line">        face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)</span><br><span class="line"></span><br><span class="line">        face_names = []</span><br><span class="line">        # 查找摄像头中的人脸与已知人脸中的哪一个最为相像</span><br><span class="line">        for face_encoding in face_encodings:</span><br><span class="line">            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)</span><br><span class="line">            name = &quot;Unknown&quot;</span><br><span class="line"></span><br><span class="line">            # 使用所有匹配的人脸中排序最先的那一个作为身份</span><br><span class="line">            if True in matches:</span><br><span class="line">                first_match_index = matches.index(True)</span><br><span class="line">                name = known_face_names[first_match_index]</span><br><span class="line"></span><br><span class="line">            face_names.append(name)</span><br><span class="line"></span><br><span class="line">    process_this_frame = not process_this_frame</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    # 将识别结果在展示在一个窗口中</span><br><span class="line">    for (top, right, bottom, left), name in zip(face_locations, face_names):</span><br><span class="line">        # 将人脸位置放大四倍，因为之前缩小了</span><br><span class="line">        top *= 4</span><br><span class="line">        right *= 4</span><br><span class="line">        bottom *= 4</span><br><span class="line">        left *= 4</span><br><span class="line"></span><br><span class="line">        # 用刚才得到的人脸位置在图像中画出方框框住人脸</span><br><span class="line">        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)</span><br><span class="line"></span><br><span class="line">        # 在人脸框的下面画上一个方框，放识别出来的名字</span><br><span class="line">        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)</span><br><span class="line">        font = cv2.FONT_HERSHEY_DUPLEX</span><br><span class="line">        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)</span><br><span class="line"></span><br><span class="line">    # 显示出身份识别结果</span><br><span class="line">    cv2.imshow(&apos;Video&apos;, frame)</span><br><span class="line"></span><br><span class="line">    # 设置按&apos;q&apos;建就会退出</span><br><span class="line">    if cv2.waitKey(1) &amp; 0xFF == ord(&apos;q&apos;):</span><br><span class="line">        break</span><br><span class="line"></span><br><span class="line"># 释放摄像头</span><br><span class="line">video_capture.release()</span><br><span class="line">cv2.destroyAllWindows()</span><br></pre></td></tr></table></figure></p>
+<p>通过以上的代码可以了解如何使用face-recognition这一模块来进行人脸识别。</p>
+<h3 id="使用PyQt"><a href="#使用PyQt" class="headerlink" title="使用PyQt"></a>使用PyQt</h3><h4 id="1-设计PyQt界面"><a href="#1-设计PyQt界面" class="headerlink" title="(1)设计PyQt界面"></a>(1)设计PyQt界面</h4><p>Qt5界面可以使用Qt designer这一工具进行设计，但是PyQt5的界面有没有简便的工具呢。事实上PyQt5也使用Qt designer这一工具，在设计完成之后，可以使用pyuic工具转换为python可以使用的界面文件<br><img src="/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/2018-06-18.png" alt="人脸识别界面"><br>如图所示为我用Qt designer设计的一个界面.ui文件，使用如下的命令将界面源码转换为.py格式的PyQt可以使用的界面文件face_check.py</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pyuic -x -o face_check.py face_check.py</span><br></pre></td></tr></table></figure>
+<h4 id="2-为界面添加交互"><a href="#2-为界面添加交互" class="headerlink" title="(2)为界面添加交互"></a>(2)为界面添加交互</h4><p>但是有了界面之后，人机交互应该如何实现呢，这需要涉及到PyQt的交互机制，下面的代码展示了为“开始”按钮增加一个点击事件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">__author__ = <span class="string">'Zhang Zhe'</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> PyQt5 <span class="keyword">import</span> QtWidgets</span><br><span class="line"><span class="keyword">from</span> face_check <span class="keyword">import</span> Ui_FaceCheck</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个新的类，这个类继承由Qt designer生成的界面类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FaceCheck</span><span class="params">(QtWidgets.QDialog, Ui_FaceCheck)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent=None)</span>:</span></span><br><span class="line">        <span class="comment"># 用来调用基类中的初始化函数</span></span><br><span class="line">        super(FaceCheck, self).__init__()</span><br><span class="line">        self.setupUi(self)</span><br><span class="line">        <span class="comment"># 通过将“开始”按钮与onStartBtnClicked()函数连接起来，为“开始”按钮增加点击事件</span></span><br><span class="line">        self.start.clicked.connect(self.onStartBtnClicked)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">onStartBtnClicked</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        登录的点击事件</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># 开始按钮的点击事件只输出一句话“这是开始按钮”，这句话将被输出到控制台的输出中</span></span><br><span class="line">        print(<span class="string">"这是开始按钮！！！"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app = QtWidgets.QApplication(sys.argv)</span><br><span class="line">    FaceCheck = FaceCheck()</span><br><span class="line">    FaceCheck.show()</span><br><span class="line">    sys.exit(app.exec_())</span><br></pre></td></tr></table></figure>
+<p>PyQt中提供了和Qt一样的信号槽机制。对于按钮来说，其默认有一个clicked事件可以连接</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PyQt/" rel="tag"># PyQt</a>
+          
+            <a href="/tags/FaceRecognition/" rel="tag"># FaceRecognition</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/12/解决CMAKE编译第三方开源软件需要下载的问题/" rel="next" title="解决CMAKE编译第三方开源软件需要下载的问题">
+                <i class="fa fa-chevron-left"></i> 解决CMAKE编译第三方开源软件需要下载的问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/12/通用论坛正文提取/" rel="prev" title="通用论坛正文提取">
+                通用论坛正文提取 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yuboona Zhang</p>
+              <p class="site-description motion-element" itemprop="description">Crazy for Tec.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/yuboona" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yuboobaZhang@Yahoo.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用Dlib、PyQt搭建人脸识别系统"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x4F7F;&#x7528;Dlib&#x3001;PyQt&#x642D;&#x5EFA;&#x4EBA;&#x8138;&#x8BC6;&#x522B;&#x7CFB;&#x7EDF;" class="headerlink" title="&#x4F7F;&#x7528;Dlib&#x3001;PyQt&#x642D;&#x5EFA;&#x4EBA;&#x8138;&#x8BC6;&#x522B;&#x7CFB;&#x7EDF;"></a>&#x4F7F;&#x7528;Dlib&#x3001;PyQt&#x642D;&#x5EFA;&#x4EBA;&#x8138;&#x8BC6;&#x522B;&#x7CFB;&#x7EDF;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#１、软硬件需求"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#xFF11;&#x3001;&#x8F6F;&#x786C;&#x4EF6;&#x9700;&#x6C42;" class="headerlink" title="&#xFF11;&#x3001;&#x8F6F;&#x786C;&#x4EF6;&#x9700;&#x6C42;"></a>&#xFF11;&#x3001;&#x8F6F;&#x786C;&#x4EF6;&#x9700;&#x6C42;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用PyQt"><span class="nav-number">1.1.1.</span> <span class="nav-text"><a href="#&#x4F7F;&#x7528;PyQt" class="headerlink" title="&#x4F7F;&#x7528;PyQt"></a>&#x4F7F;&#x7528;PyQt</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-设计PyQt界面"><span class="nav-number">1.1.1.1.</span> <span class="nav-text"><a href="#1-&#x8BBE;&#x8BA1;PyQt&#x754C;&#x9762;" class="headerlink" title="(1)&#x8BBE;&#x8BA1;PyQt&#x754C;&#x9762;"></a>(1)&#x8BBE;&#x8BA1;PyQt&#x754C;&#x9762;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-为界面添加交互"><span class="nav-number">1.1.1.2.</span> <span class="nav-text"><a href="#2-&#x4E3A;&#x754C;&#x9762;&#x6DFB;&#x52A0;&#x4EA4;&#x4E92;" class="headerlink" title="(2)&#x4E3A;&#x754C;&#x9762;&#x6DFB;&#x52A0;&#x4EA4;&#x4E92;"></a>(2)&#x4E3A;&#x754C;&#x9762;&#x6DFB;&#x52A0;&#x4EA4;&#x4E92;</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yuboona Zhang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

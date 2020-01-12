@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,bs4,jieba," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768 背景 参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内">
+<meta name="keywords" content="Python,bs4,jieba">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通用论坛正文提取">
+<meta property="og:url" content="http://yoursite.com/2020/01/12/通用论坛正文提取/index.html">
+<meta property="og:site_name" content="Thinking makes Someone">
+<meta property="og:description" content="本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768 背景 参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://111.230.251.140:8000/images/before.png">
+<meta property="og:image" content="http://111.230.251.140:8000/images/after.png">
+<meta property="og:image" content="http://111.230.251.140:8000/images/3txt.png">
+<meta property="og:image" content="http://111.230.251.140:8000/images/aftertxt.png">
+<meta property="og:updated_time" content="2020-01-12T02:53:30.564Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通用论坛正文提取">
+<meta name="twitter:description" content="本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768 背景 参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内">
+<meta name="twitter:image" content="http://111.230.251.140:8000/images/before.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/01/12/通用论坛正文提取/"/>
+
+
+
+
+
+  <title>通用论坛正文提取 | Thinking makes Someone</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Thinking makes Someone</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Learn for Knowledge,Code from Zero.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/通用论坛正文提取/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Thinking makes Someone">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通用论坛正文提取</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T10:46:09+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-spiders/" itemprop="url" rel="index">
+                    <span itemprop="name">Web spiders</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本人长期出售超大量微博数据、旅游网站评论数据，并提供各种指定数据爬取服务，Message to YuboonaZhang@Yahoo.com。同时欢迎加入社交媒体数据交流群：99918768</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><blockquote>
+<p>参加泰迪杯数据挖掘竞赛，这次真的学习到了不少东西，最后差不多可以完成要求的内容，准确率也还行。总共的代码，算上中间的过程处理也不超过500行，代码思想也还比较简单，主要是根据论坛的短文本特性和楼层之间内容的相似来完成的。(通俗点说就是去噪去噪去噪，然后只留下相对有规律的日期，内容)</p>
+</blockquote>
+<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><ol>
+<li><p>软件和开发环境： Pycharm，Python2.7，Linux系统</p>
+</li>
+<li><p>用的主要Python包： jieba， requests， BeautifulSoup， goose， selenium， PhantomJS， pymongo等(部分软件的安装我前面的博客有介绍)</p>
+</li>
+</ol>
+<h2 id="网页预处理"><a href="#网页预处理" class="headerlink" title="网页预处理"></a>网页预处理</h2><p>首先因为网站很多是动态的，直接用bs4是获取不到有些信息的，所以我们使用selenium和phantomjs将文件保存在本地，然后再处理。</p>
+<p>相关的代码是</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save</span><span class="params">(baseUrl)</span>:</span></span><br><span class="line">    driver = webdriver.PhantomJS()</span><br><span class="line">    driver.get(baseUrl) <span class="comment"># seconds</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        element = WebDriverWait(driver, <span class="number">10</span>).until(isload(driver) <span class="keyword">is</span> <span class="keyword">True</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception, e:</span><br><span class="line">        <span class="keyword">print</span> e</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">        data = driver.page_source  <span class="comment"># 取到加载js后的页面content</span></span><br><span class="line">    driver.quit()</span><br><span class="line">    <span class="keyword">return</span> data</span><br></pre></td></tr></table></figure>
+<p>由于网页中存在着大量的噪音（广告，图片等），首先我们需要将与我们所提取内容不一致的所有噪声尽可能去除。我们首先选择将一些带有典型噪声意义的噪声标签去除，比如script等，方法我们选择BeautifulSoup来完成。</p>
+<p>代码大概是这样</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> element <span class="keyword">in</span> soup(text=<span class="keyword">lambda</span> text: isinstance(text, Comment)):</span><br><span class="line">    element.extract()</span><br><span class="line"></span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'script'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'meta'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'style'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'link'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'img'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'input'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'br'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'li'</span>)]</span><br><span class="line">[s.extract() <span class="keyword">for</span> s <span class="keyword">in</span> soup(<span class="string">'ul'</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> (soup.prettify())</span><br></pre></td></tr></table></figure>
+<p>处理之后的网页对比</p>
+<p><img src="http://111.230.251.140:8000/images/before.png" alt="之前"></p>
+<p><img src="http://111.230.251.140:8000/images/after.png" alt="之后"></p>
+<p>可以看出网页噪声少了很多，但是还是不足以从这么多噪声中提取出我们所要的内容</p>
+<p>由于我们不需要标签只需要标签里面的文字,所以我们可以利用BeautifulSoup提取出文字内容再进行分析</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> string <span class="keyword">in</span> soup.stripped_strings:</span><br><span class="line">    print(string)</span><br><span class="line">    <span class="keyword">with</span> open(os.path.join(os.getcwd())+<span class="string">"/data/3.txt"</span>, <span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.writelines(string.encode(<span class="string">'utf-8'</span>)+<span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="http://111.230.251.140:8000/images/3txt.png" alt="去除噪声标签之后的信息"></p>
+<p>可以看出来还是非常杂乱，但是又是十分有规律的。我们可以发现每个楼层中的文本内容实质上都差不多，可以说重复的很多，而且都是一些特定的词，比如: <strong>直达楼层</strong>, <strong>板凳</strong>,<strong>沙发</strong>,等这类的词，所以我们需要将这些词删掉然后再进行分析</p>
+<p>我所用的方法是利用jieba分词来对获取的网页文本进行分词，统计出出现词频最高的词，同时也是容易出现在噪声文章中的词语，代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba.analyse</span><br><span class="line"></span><br><span class="line">text = open(<span class="string">r"./data/get.txt"</span>, <span class="string">"r"</span>).read()</span><br><span class="line"></span><br><span class="line">dic = &#123;&#125;</span><br><span class="line">cut = jieba.cut_for_search(text)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> fc <span class="keyword">in</span> cut:</span><br><span class="line">    <span class="keyword">if</span> fc <span class="keyword">in</span> dic:</span><br><span class="line">        dic[fc] += <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        dic[fc] = <span class="number">1</span></span><br><span class="line">blog = jieba.analyse.extract_tags(text, topK=<span class="number">1000</span>, withWeight=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> word_weight <span class="keyword">in</span> blog:</span><br><span class="line">    <span class="comment"># print (word_weight[0].encode('utf-8'), dic.get(word_weight[0], 'not found'))</span></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'cut.txt'</span>, <span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.writelines(word_weight[<span class="number">0</span>].encode(<span class="string">'utf-8'</span>) + <span class="string">"    "</span> + str(dic.get(word_weight[<span class="number">0</span>], <span class="string">'not found'</span>)) + <span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+<p>统计出来然后经过我们测试和筛选得出的停用词有这些</p>
+<blockquote>
+<p>回帖<br>积分<br>帖子<br>登录<br>论坛<br>注册<br>离线<br>时间<br>作者<br>签到<br>主题<br>精华<br>客户端<br>手机<br>下载<br>分享</p>
+</blockquote>
+<p>目前统计的词大约200左右。</p>
+<p>然后还有去除重复文本的工作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 去重函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_dup</span><span class="params">(items)</span>:</span></span><br><span class="line">    pattern1 = re.compile(<span class="string">r'发表于'</span>)</span><br><span class="line">    pattern2 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern3 = re.compile(<span class="string">'\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern4 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern5 = re.compile(<span class="string">r'[^0-9a-zA-Z]&#123;7,&#125;'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 用集合来作为容器，来做一部分的重复判断依据，另外的部分由匹配来做</span></span><br><span class="line">    <span class="comment"># yield用于将合适的文本用生成器得到迭代器，这样就进行了文本的删除，在函数外面</span></span><br><span class="line">    <span class="comment"># 可以用函数进行文本的迭代</span></span><br><span class="line">    seen = set()</span><br><span class="line">    <span class="keyword">for</span> item <span class="keyword">in</span> items:</span><br><span class="line">        match1 = pattern1.match(item)</span><br><span class="line">        match2 = pattern2.match(item)</span><br><span class="line">        match3 = pattern3.match(item)</span><br><span class="line">        match4 = pattern4.match(item)</span><br><span class="line">        match5 = pattern5.match(item)</span><br><span class="line">        <span class="keyword">if</span> item <span class="keyword">not</span> <span class="keyword">in</span> seen <span class="keyword">or</span> match1 <span class="keyword">or</span> match2 <span class="keyword">or</span> match3 <span class="keyword">or</span> match4 <span class="keyword">or</span> match5:</span><br><span class="line">            <span class="keyword">yield</span> item</span><br><span class="line">        seen.add(item)  <span class="comment"># 向集合中加入item，集合会自动化删除掉重复的项目</span></span><br></pre></td></tr></table></figure>
+<p>在经过观察处理后的网页文本，我们发现还有一项噪声无法忽略，那就是纯数字。因为网页文本中有很多纯数字但是又不重复，比如<strong>点赞数</strong>等，所以我准备用正则匹配出纯数字然后删除。但是这样就会出现问题…因为有些用户名是纯数字的，这样我们会把用户名删掉的。为了解决这个问题我们使用保留字符数大于7的纯数字，这样既删除了大部分的没用信息又尽可能的保留了用户名</p>
+<p>相关的代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">st = []</span><br><span class="line">    <span class="keyword">for</span> stop_word <span class="keyword">in</span> stop_words:</span><br><span class="line">        st.append(stop_word.strip(<span class="string">'\n'</span>))</span><br><span class="line">    t = tuple(st)</span><br><span class="line">    <span class="comment"># t,元组，和列表的区别是，不能修改使用（，，，，），与【，，，】列表不同</span></span><br><span class="line">    lines = []</span><br><span class="line">    <span class="comment"># 删除停用词和短数字实现</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> after_string:</span><br><span class="line">        <span class="comment"># 如果一行的开头不是以停用词开头，那么读取这一行</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> j.startswith(t):</span><br><span class="line">            <span class="comment"># 如何一行不全是数字，或者这行的数字数大于7（区别无关数字和数字用户名）读取这一行</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> re.match(<span class="string">'\d+$'</span>, j) <span class="keyword">or</span> len(j) &gt; <span class="number">7</span>:</span><br><span class="line">                lines.append(j.strip())</span><br><span class="line">                <span class="comment"># 删除所有空格并输出</span></span><br><span class="line">                <span class="keyword">print</span> (j.strip())</span><br></pre></td></tr></table></figure>
+<p>处理之后的文本如下，规律十分明显了</p>
+<p><img src="http://111.230.251.140:8000/images/aftertxt.png" alt="去除噪声标签之后的信息"></p>
+<p>接下来就是我们进行内容提取的时候了</p>
+<h2 id="内容提取"><a href="#内容提取" class="headerlink" title="内容提取"></a>内容提取</h2><p>内容提取无非是找到评论块，而评论块在上面我们的图中已经十分清晰了，我们自然而然的想到根据日期来区分评论块。经过观察，所有的论坛中日期的形式只有5种（目前只看到5种，当然后期可以加上）。我们可以用正则匹配出日期所在的行，根据两个日期所在行数的中间所夹的就是评论内容和用户名来完成我们的评论内容提取。</p>
+<p>传入我们处理后的文本然后就匹配出日期所在行数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配日期返回get_list</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">match_date</span><span class="params">(lines)</span>:</span></span><br><span class="line">    pattern1 = re.compile(<span class="string">r'发表于'</span>)</span><br><span class="line">    pattern2 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern3 = re.compile(<span class="string">'\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern4 = re.compile(<span class="string">'\d&#123;4&#125;-\d&#123;1,2&#125;-\d&#123;1,2&#125; \d&#123;2&#125;:\d&#123;2&#125;'</span>)</span><br><span class="line">    pattern5 = re.compile(<span class="string">r'发表日期'</span>)</span><br><span class="line"></span><br><span class="line">    pre_count = <span class="number">-1</span></span><br><span class="line">    get_list = []</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 匹配日期文本</span></span><br><span class="line">    <span class="keyword">for</span> string <span class="keyword">in</span> lines:</span><br><span class="line">        match1 = pattern1.match(string)</span><br><span class="line">        match2 = pattern2.match(string)</span><br><span class="line">        match3 = pattern3.match(string)</span><br><span class="line">        match4 = pattern4.match(string)</span><br><span class="line">        match5 = pattern5.match(string)</span><br><span class="line">        pre_count += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> match1 <span class="keyword">or</span> match2 <span class="keyword">or</span> match3 <span class="keyword">or</span> match4 <span class="keyword">or</span> match5:</span><br><span class="line">            get_dic = &#123;<span class="string">'count'</span>: pre_count, <span class="string">'date'</span>: string&#125;</span><br><span class="line">            get_list.append(get_dic)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 返回的是匹配日期后的信息</span></span><br><span class="line">    <span class="keyword">return</span> get_list</span><br></pre></td></tr></table></figure>
+<p>因为有回帖和没有回帖处理方式也不一样所以我们需要分类进行讨论。因为我们知道评论的内容是在两个匹配日期的中间，这样就有一个问题就是最后一个评论的内容区域不好分。但是考虑到大部分的最后一个回帖都是一行我们可以暂取值为3（sub==3，考虑一行评论和一行用户名），后来想到一种更为科学的方法，比如判断后面几行的文本密度，如果很小说明只有一行评论的可能性更大。</p>
+<p>下面的代码是获取日期所在行数和两个日期之间的行数差</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回my_count</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_count</span><span class="params">(get_list)</span>:</span></span><br><span class="line">    my_count = []</span><br><span class="line">    date = []</span><br><span class="line">    <span class="comment"># 获取时间所在行数</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> get_list:</span><br><span class="line">        k, t = i.get(<span class="string">'count'</span>), i.get(<span class="string">'date'</span>)</span><br><span class="line">        my_count.append(k)</span><br><span class="line">        date.append(t)</span><br><span class="line">    <span class="keyword">if</span> len(get_list) &gt; <span class="number">1</span>:</span><br><span class="line">        <span class="comment"># 最后一行暂时取3</span></span><br><span class="line">        my_count.append(my_count[<span class="number">-1</span>] + <span class="number">3</span>)</span><br><span class="line">        <span class="keyword">return</span> my_count</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> my_count</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取两个时间所在的行数差</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_sub</span><span class="params">(my_count)</span>:</span></span><br><span class="line">    sub = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(my_count) - <span class="number">1</span>):</span><br><span class="line">        sub.append(my_count[i + <span class="number">1</span>] - my_count[i])</span><br><span class="line">    <span class="keyword">return</span> sub</span><br></pre></td></tr></table></figure>
+<p>接下来就要分类讨论了</p>
+<ol>
+<li><p>如果只有楼主没有评论（即my——count==1），这个时候我们可以使用开源的正文提取软件goose来提取正文。</p>
+</li>
+<li><p>如果有评论我们就需要根据sub的值来进行分类如果sub==2占多数（或者说比sub==3）占的多，那么我们就认为可能是用户名被删掉，删掉的原因有很多，比如去重的时候有人在楼中楼回复了导致用户名重复被删除，有可能该网站的标签比较特殊用户名在去标签的时候删除等，情况比较复杂且出现的频率不太高，暂未考虑。何况不影响我们提取评论内容，只需分类出来考虑就行</p>
+</li>
+</ol>
+<font color="#FF0000" size="4" face="黑体"><br>注意：下面余弦相似度这个是我开始的时候想多了！大部分情况就是：日期-评论-用户名，后来我没有考虑余弦相似度分类，代码少了，精度也没有下降。这里不删是想留下一个思考的过程。代码看看就好，最后有修改后的源码。<br></font>
+
+<ol>
+<li>还有就是最常见的内容，就是sub==3占多数的情况。因为大部分的评论都是一行文本，所以我们需要考虑的的是sub==3的时候获取的评论文本在哪一行。通俗来说就是这三行的内容是<strong>日期-评论-用户名</strong>，还是<strong>日期-用户名-评论</strong>呢？虽然大部分是第一种情况，但是第二种情况我们也不能忽略。怎么判断这两种情况呢？这确实让我思考了很长一段时间，后来想到可以用余弦相似度来解决这个问题.科普余弦相似度可以看<a href="http://www.ruanyifeng.com/blog/2013/03/cosine_similarity.html" target="_blank" rel="noopener">这里</a>。简单来说就是用户名的长度都是相似的，但是评论的内容长度差异就非常大了。比如用户名长度都是7个字符左右，但是评论的长度可以数百，也可以只有一个。所以我们可以两两比较余弦相似度，然后取平均，相似度大的就是用户名了。这样我们就可以区分出评论内容进行提取了！这就是主要的思想。剩下的就是代码的实现了。</li>
+</ol>
+<p>简单贴一下相关的代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 利用goose获取正文内容</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">goose_content</span><span class="params">(my_count, lines, my_url)</span>:</span></span><br><span class="line">    g = Goose(&#123;<span class="string">'stopwords_class'</span>: StopWordsChinese&#125;)</span><br><span class="line">    content_1 = g.extract(url=my_url)</span><br><span class="line">    host = &#123;&#125;</span><br><span class="line">    my_list = []</span><br><span class="line">    host[<span class="string">'content'</span>] = content_1.cleaned_text</span><br><span class="line">    host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">    host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">    result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">    SpiderBBS_info.insert(result)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算余弦相似度函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cos_dist</span><span class="params">(a, b)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> len(a) != len(b):</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    part_up = <span class="number">0.0</span></span><br><span class="line">    a_sq = <span class="number">0.0</span></span><br><span class="line">    b_sq = <span class="number">0.0</span></span><br><span class="line">    <span class="keyword">for</span> a1, b1 <span class="keyword">in</span> zip(a, b):</span><br><span class="line">        part_up += a1 * b1</span><br><span class="line">        a_sq += a1 ** <span class="number">2</span></span><br><span class="line">        b_sq += b1 ** <span class="number">2</span></span><br><span class="line">    part_down = math.sqrt(a_sq * b_sq)</span><br><span class="line">    <span class="keyword">if</span> part_down == <span class="number">0.0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> part_up / part_down</span><br><span class="line"></span><br><span class="line"><span class="comment"># 判断评论内容在哪一行（可能在3行评论块的中间，可能在三行评论块的最后）</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_3_comment</span><span class="params">(my_count, lines)</span>:</span></span><br><span class="line">    get_pd_1 = []</span><br><span class="line">    get_pd_2 = []</span><br><span class="line">    <span class="comment"># 如果间隔为3取出所在行的文本长度</span></span><br><span class="line">    test_sat_1 = []</span><br><span class="line">    test_sat_2 = []</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(len(my_count)<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">if</span> my_count[num+<span class="number">1</span>] - <span class="number">3</span> == my_count[num]:</span><br><span class="line">            pd_1 = (len(lines[my_count[num]]), len(lines[my_count[num]+<span class="number">2</span>]))</span><br><span class="line">            get_pd_1.append(pd_1)</span><br><span class="line">            pd_2 = (len(lines[my_count[num]]), len(lines[my_count[num]+<span class="number">1</span>]))</span><br><span class="line">            get_pd_2.append(pd_2)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i_cos <span class="keyword">in</span> range(len(get_pd_1)<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">for</span> j_cos <span class="keyword">in</span> range(i_cos+<span class="number">1</span>, len(get_pd_1)):</span><br><span class="line">            <span class="comment"># 计算文本余弦相似度</span></span><br><span class="line">            test_sat_1.append(cos_dist(get_pd_1[j_cos], get_pd_1[i_cos]))</span><br><span class="line">            test_sat_2.append(cos_dist(get_pd_2[j_cos], get_pd_2[i_cos]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算余弦相似度的平均值</span></span><br><span class="line">    get_mean_1 = numpy.array(test_sat_1)</span><br><span class="line">    <span class="keyword">print</span> (get_mean_1.mean())</span><br><span class="line">    get_mean_2 = numpy.array(test_sat_2)</span><br><span class="line">    <span class="keyword">print</span> (get_mean_2.mean())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 比较大小返回是否应该按</span></span><br><span class="line">    <span class="keyword">if</span> get_mean_1.mean() &gt;= get_mean_2.mean():</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">elif</span> get_mean_1.mean() &lt; get_mean_2.mean():</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取评论内容</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">solve__3</span><span class="params">(num, my_count, sub, lines, my_url)</span>:</span></span><br><span class="line">    <span class="comment"># 如果get_3_comment()返回的值是1，那么说明最后一行是用户名的可能性更大，否则第一行是用户名的可能性更大</span></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">1</span>:</span><br><span class="line">        host = &#123;&#125;</span><br><span class="line">        my_list = []</span><br><span class="line">        host[<span class="string">'content'</span>] = <span class="string">''</span>.join(lines[my_count[<span class="number">0</span>]+<span class="number">1</span>: my_count[<span class="number">1</span>]+sub[<span class="number">0</span>]<span class="number">-1</span>])</span><br><span class="line">        host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">        host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">        <span class="keyword">for</span> use <span class="keyword">in</span> range(<span class="number">1</span>, len(my_count)<span class="number">-1</span>):</span><br><span class="line">            pl = &#123;<span class="string">'content'</span>: <span class="string">''</span>.join(lines[my_count[use] + <span class="number">1</span>:my_count[use + <span class="number">1</span>] - <span class="number">1</span>]), <span class="string">'date'</span>: lines[my_count[use]],</span><br><span class="line">                  <span class="string">'title'</span>: get_title(my_url)&#125;</span><br><span class="line">            my_list.append(pl)</span><br><span class="line"></span><br><span class="line">        result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">        SpiderBBS_info.insert(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">2</span>:</span><br><span class="line">        host = &#123;&#125;</span><br><span class="line">        my_list = []</span><br><span class="line">        host[<span class="string">'content'</span>] = <span class="string">''</span>.join(lines[my_count[<span class="number">0</span>]+<span class="number">2</span>: my_count[<span class="number">1</span>]+sub[<span class="number">0</span>]])</span><br><span class="line">        host[<span class="string">'date'</span>] = lines[my_count[<span class="number">0</span>]]</span><br><span class="line">        host[<span class="string">'title'</span>] = get_title(my_url)</span><br><span class="line">        <span class="keyword">for</span> use <span class="keyword">in</span> range(<span class="number">1</span>, len(my_count) - <span class="number">1</span>):</span><br><span class="line">            pl = &#123;<span class="string">'content'</span>: <span class="string">''</span>.join(lines[my_count[use] + <span class="number">2</span>:my_count[use + <span class="number">1</span>]]), <span class="string">'date'</span>: lines[my_count[use]],</span><br><span class="line">                  <span class="string">'title'</span>: get_title(my_url)&#125;</span><br><span class="line">            my_list.append(pl)</span><br><span class="line"></span><br><span class="line">        result = &#123;<span class="string">"post"</span>: host, <span class="string">"replys"</span>: my_list&#125;</span><br><span class="line">        SpiderBBS_info.insert(result)</span><br></pre></td></tr></table></figure>
+<h2 id="展望"><a href="#展望" class="headerlink" title="展望"></a>展望</h2><p>提取的准确率应该要分析更多的bbs网站，优化删除重复词（太粗暴），优化停用词，针对短文本没回复情况的优化，准确提取楼主的用户名等，无奈时间太紧无法进一步优化。才疏学浅，刚学了几个月python，代码难免有不合理的地方，望各位提出宝贵意见。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/bs4/" rel="tag"># bs4</a>
+          
+            <a href="/tags/jieba/" rel="tag"># jieba</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/12/使用Dlib、PyQt搭建人脸识别系统/" rel="next" title="使用Dlib、PyQt搭建人脸识别系统">
+                <i class="fa fa-chevron-left"></i> 使用Dlib、PyQt搭建人脸识别系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yuboona Zhang</p>
+              <p class="site-description motion-element" itemprop="description">Crazy for Tec.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/yuboona" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yuboobaZhang@Yahoo.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x80CC;&#x666F;" class="headerlink" title="&#x80CC;&#x666F;"></a>&#x80CC;&#x666F;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前期准备"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x524D;&#x671F;&#x51C6;&#x5907;" class="headerlink" title="&#x524D;&#x671F;&#x51C6;&#x5907;"></a>&#x524D;&#x671F;&#x51C6;&#x5907;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网页预处理"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x7F51;&#x9875;&#x9884;&#x5904;&#x7406;" class="headerlink" title="&#x7F51;&#x9875;&#x9884;&#x5904;&#x7406;"></a>&#x7F51;&#x9875;&#x9884;&#x5904;&#x7406;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内容提取"><span class="nav-number">1.3.</span> <span class="nav-text"><a href="#&#x5185;&#x5BB9;&#x63D0;&#x53D6;" class="headerlink" title="&#x5185;&#x5BB9;&#x63D0;&#x53D6;"></a>&#x5185;&#x5BB9;&#x63D0;&#x53D6;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#展望"><span class="nav-number">1.4.</span> <span class="nav-text"><a href="#&#x5C55;&#x671B;" class="headerlink" title="&#x5C55;&#x671B;"></a>&#x5C55;&#x671B;</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yuboona Zhang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
