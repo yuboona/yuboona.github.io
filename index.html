@@ -252,6 +252,180 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/如何在深度学习中使用开源Chinese-Word-Vectors/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Concentrate on myself.">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/12/如何在深度学习中使用开源Chinese-Word-Vectors/" itemprop="url">如何在深度学习中使用开源Chinese Word Vectors</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-12T21:06:18+08:00">
+                2020-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NLP/" itemprop="url" rel="index">
+                    <span itemprop="name">NLP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="如何在深度学习中使用开源Chinese-Word-Vectors"><a href="#如何在深度学习中使用开源Chinese-Word-Vectors" class="headerlink" title="如何在深度学习中使用开源Chinese Word Vectors"></a>如何在深度学习中使用开源Chinese Word Vectors</h1><blockquote>
+<p>摘要:Chinese-Word-Vectors开源项目提供了100多种预训练模型，但在深度学习中使用时，加载预训练向量存在词表重复项问题。本文着重于解决加载问题。</p>
+</blockquote>
+<h2 id="1-起因"><a href="#1-起因" class="headerlink" title="1. 起因"></a>1. 起因</h2><p>去年半年一直在搭建我的NLP练习项目——<a href="https://github.com/yuboona/punctuation-restoration-pytorch" target="_blank" rel="noopener">为语音识别文本进行标点恢复</a>，使用的技术如下所示：</p>
+<ul>
+<li>词向量训练</li>
+<li>BiLSTM</li>
+<li>CRF</li>
+</ul>
+<p>但是上面的技术在训练网络的时候，词向量是在训练中不断训练得到的。一方面这样的词向量更配合网络的结构，具有任务特定性；但是另一方面，受限于语料大小和计算资源，直接由自己的数据集训练出的词向量肯定是<strong>不够泛化，不够强健的</strong>。</p>
+<h2 id="2-Chinese-Word-Vectors技术方案存在的问题"><a href="#2-Chinese-Word-Vectors技术方案存在的问题" class="headerlink" title="2. Chinese-Word-Vectors技术方案存在的问题"></a>2. Chinese-Word-Vectors技术方案存在的问题</h2><p>时至今日，在2019年bert横扫NLP任务之后，使用<strong>预训练模型</strong>已经不再稀奇。使用预训练的模型可以用更少的训练资源得到较好的效果。即使是使用传统的word2vec也能有效提高模型的泛化性。</p>
+<p><a href="https://github.com/Embedding/Chinese-Word-Vectors" target="_blank" rel="noopener">Chinese-Word-Vectors</a>是北京师范大学和人民大学的研究者开源出来的100多个中文预训练词向量，所有向量都是在word2vec和skip-gram上训练出来的。</p>
+<p>久仰大名，码下很久，但是未尝亲自试用。亲自使用后，便发现了一些问题。</p>
+<ul>
+<li>如何读取从<a href="https://github.com/Embedding/Chinese-Word-Vectors" target="_blank" rel="noopener">Chinese-Word-Vectors</a>下载下来的词向量？</li>
+<li>读取时发现词表有重复，导致存入python字典中后，导致词表大小和训练好的词向量矩阵不一致？</li>
+<li>读取到的词向量矩阵如何载入到深度学习模型的词嵌入矩阵embedding中？</li>
+</ul>
+<p>果然<strong>纸上得来终觉浅，绝知此事要躬行</strong>。</p>
+<h2 id="3-问题解决方式"><a href="#3-问题解决方式" class="headerlink" title="3. 问题解决方式"></a>3. 问题解决方式</h2><ol>
+<li>词向量文件本身是以文本方式存储的，第一行是词向量size信息，后面每一行是每个词和它的词向量。通过使用<a href="https://github.com/zhezhaoa/ngram2vec" target="_blank" rel="noopener">ngram2vec工具</a>中的代码可以加载词向量（Chinese-Word-Vectors也使用了ngram2vec工具来训练）:</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_dense</span><span class="params">(path)</span>:</span></span><br><span class="line">    vocab_size, size = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    vocab = &#123;&#125;</span><br><span class="line">    vocab[<span class="string">"i2w"</span>], vocab[<span class="string">"w2i"</span>] = [], &#123;&#125;</span><br><span class="line">    <span class="keyword">with</span> codecs.open(path, <span class="string">"r"</span>, <span class="string">"utf-8"</span>) <span class="keyword">as</span> f:</span><br><span class="line">        first_line = <span class="keyword">True</span></span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">            <span class="keyword">if</span> first_line:</span><br><span class="line">                first_line = <span class="keyword">False</span></span><br><span class="line">                vocab_size = int(line.strip().split()[<span class="number">0</span>])</span><br><span class="line">                size = int(line.rstrip().split()[<span class="number">1</span>])</span><br><span class="line">                matrix = np.zeros(shape=(vocab_size, size), dtype=np.float32)</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            vec = line.strip().split()</span><br><span class="line">            vocab[<span class="string">"i2w"</span>].append(vec[<span class="number">0</span>])</span><br><span class="line">            <span class="comment"># vocab的length不断增长</span></span><br><span class="line">            matrix[len(vocab[<span class="string">"i2w"</span>])<span class="number">-1</span>, :] = np.array([float(x) <span class="keyword">for</span> x <span class="keyword">in</span> vec[<span class="number">1</span>:]])</span><br><span class="line">    <span class="keyword">for</span> i, w <span class="keyword">in</span> enumerate(vocab[<span class="string">"i2w"</span>]):</span><br><span class="line">        vocab[<span class="string">"w2i"</span>][w] = i</span><br><span class="line">    <span class="keyword">return</span> matrix, vocab, size</span><br></pre></td></tr></table></figure>
+<ol>
+<li>词表重复问题，是实际加载词向量中遇到的比较麻烦的问题，重复的词表导致无法用字典来索引每个词对应的词向量，所以上一步的词向量加载，实际上应该考虑重复问题：</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_dense_drop_repeat</span><span class="params">(path)</span>:</span></span><br><span class="line">    vocab_size, size = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    vocab = &#123;&#125;</span><br><span class="line">    vocab[<span class="string">"i2w"</span>], vocab[<span class="string">"w2i"</span>] = [], &#123;&#125;</span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    <span class="keyword">with</span> codecs.open(path, <span class="string">"r"</span>, <span class="string">"utf-8"</span>) <span class="keyword">as</span> f:</span><br><span class="line">        first_line = <span class="keyword">True</span></span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">            <span class="keyword">if</span> first_line:</span><br><span class="line">                first_line = <span class="keyword">False</span></span><br><span class="line">                vocab_size = int(line.strip().split()[<span class="number">0</span>])</span><br><span class="line">                size = int(line.rstrip().split()[<span class="number">1</span>])</span><br><span class="line">                matrix = np.zeros(shape=(vocab_size, size), dtype=np.float32)</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            vec = line.strip().split()</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> vocab[<span class="string">"w2i"</span>].__contains__(vec[<span class="number">0</span>]):</span><br><span class="line">                vocab[<span class="string">"w2i"</span>][vec[<span class="number">0</span>]] = count</span><br><span class="line">                matrix[count, :] = np.array([float(x) <span class="keyword">for</span> x <span class="keyword">in</span> vec[<span class="number">1</span>:]])</span><br><span class="line">                count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> w, i <span class="keyword">in</span> vocab[<span class="string">"w2i"</span>].items():</span><br><span class="line">        vocab[<span class="string">"i2w"</span>].append(w)</span><br><span class="line">    <span class="keyword">return</span> matrix, vocab, size, len(vocab[<span class="string">"i2w"</span>])</span><br></pre></td></tr></table></figure>
+<ol>
+<li>如何将得到的此向量矩阵matrix载入到torch中的embedding中？（上一步中，为了减少每次读matrix的耗时，可以将matrix用numpy保存到npy文件）:</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">emb = np.load(emb)</span><br><span class="line">print(<span class="string">'emb的shape:'</span>, emb.shape)</span><br><span class="line">self.embedding = nn.Embedding(vocab_size, embedding_size)</span><br><span class="line">self.embedding.weight.data.copy_(torch.from_numpy(emb))</span><br><span class="line">self.embedding.weight.requires_grad = <span class="keyword">True</span></span><br></pre></td></tr></table></figure>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>总的来看<a href="https://github.com/Embedding/Chinese-Word-Vectors" target="_blank" rel="noopener">Chinese-Word-Vectors</a>预训练数据是有其价值的，减少了很多的训练资源。但是由于自然语言处理的文本本身具有非常大的噪声，很难保证词向量是完美的、不包含任何错字和重复。</p>
+<p>在使用<a href="https://github.com/Embedding/Chinese-Word-Vectors" target="_blank" rel="noopener">Chinese-Word-Vectors</a>过程中，尽量要匹配好自己的需求。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/通用论坛正文提取/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1369,7 +1543,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1380,7 +1554,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1391,7 +1565,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
