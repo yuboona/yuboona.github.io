@@ -81,13 +81,13 @@
 
 <meta name="description" content="Don&apos;t focus too much.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Focus on my own.">
+<meta property="og:title" content="Focus on self">
 <meta property="og:url" content="http://yoursite.com/index.html">
-<meta property="og:site_name" content="Focus on my own.">
+<meta property="og:site_name" content="Focus on self">
 <meta property="og:description" content="Don&apos;t focus too much.">
 <meta property="og:locale" content="en">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Focus on my own.">
+<meta name="twitter:title" content="Focus on self">
 <meta name="twitter:description" content="Don&apos;t focus too much.">
 
 
@@ -124,7 +124,7 @@
 
 
 
-  <title>Focus on my own.</title>
+  <title>Focus on self</title>
   
 
 
@@ -155,7 +155,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Focus on my own.</span>
+        <span class="site-title">Focus on self</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -252,6 +252,154 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/06/matplotlib-pyplot-draw绘制动画时异常/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yuboona Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Focus on self">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/02/06/matplotlib-pyplot-draw绘制动画时异常/" itemprop="url">matplotlib.pyplot.draw绘制动画时异常</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-02-06T22:45:06+08:00">
+                2020-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python作图/" itemprop="url" rel="index">
+                    <span itemprop="name">python作图</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="matplotlib-pyplot-draw绘制动画时异常"><a href="#matplotlib-pyplot-draw绘制动画时异常" class="headerlink" title="matplotlib.pyplot.draw绘制动画时异常"></a>matplotlib.pyplot.draw绘制动画时异常</h1><h2 id="1-问题"><a href="#1-问题" class="headerlink" title="1. 问题"></a>1. 问题</h2><p>在玩《python极客项目编程》中的吉他声音模拟时，会将声音的震动图像画出来，但使用matplotlib.pyplot.draw画图时，出现了没有任何图象被绘制出来的情况。</p>
+<h2 id="2-原因"><a href="#2-原因" class="headerlink" title="2. 原因"></a>2. 原因</h2><p>《python极客项目编程》提供的代码没有问题，但是这是相对于它使用的matplotlib的版本来说没问题。</p>
+<ul>
+<li><strong>早期</strong><code>draw()</code>函数是同步更新界面的，即调用函数后就会立刻绘制</li>
+<li><strong>后来</strong>的版本却变成了空闲异步更新界面，即等到有时间了才会绘制</li>
+</ul>
+<h2 id="3-解决方案"><a href="#3-解决方案" class="headerlink" title="3. 解决方案"></a>3. 解决方案</h2><p>在<code>draw()</code>函数后，加一个<code>pause()</code>函数来给一个空闲时间，让它有时间绘制。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/如何在深度学习中使用开源Chinese-Word-Vectors/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -261,7 +409,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -435,7 +583,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -636,7 +784,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -770,7 +918,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -925,7 +1073,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -1081,7 +1229,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -1232,7 +1380,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -1361,7 +1509,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Focus on my own.">
+      <meta itemprop="name" content="Focus on self">
     </span>
 
     
@@ -1543,7 +1691,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1554,7 +1702,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1565,7 +1713,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
